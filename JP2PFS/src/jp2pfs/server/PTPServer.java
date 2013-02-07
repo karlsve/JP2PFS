@@ -4,7 +4,9 @@
  */
 package jp2pfs.server;
 
+import java.net.ServerSocket;
 import java.net.SocketAddress;
+import java.util.ArrayList;
 import java.util.List;
 import jp2pfs.client.PTPClient;
 
@@ -14,8 +16,21 @@ import jp2pfs.client.PTPClient;
  */
 public class PTPServer extends Thread {
     
-    public PTPServer() {
-        
+    ServerSocket connection = null;
+    int port = 0;
+    
+    List<PTPServerListener> serverListener = new ArrayList<PTPServerListener>();
+    
+    public PTPServer(int port) {
+        this.port = port;
+    }
+    
+    private void init() {
+        try {
+            this.connection = new ServerSocket(this.port);
+        } catch(Exception e) {
+            this.sendError(this, 500, "Could not connect to server.");
+        }
     }
     
     public PTPClient addClient(String name, SocketAddress ip, int port) {
@@ -40,6 +55,14 @@ public class PTPServer extends Thread {
     
     public List<PTPClient> getClientsOnline() {
         return null;
+    }
+    
+    public void sendError(Object sender, int code, String message) {
+        PTPServerError error = new PTPServerError(sender, code, message);
+        for(PTPServerListener listener : serverListener) {
+            if(listener != null)
+                listener.onError(error);
+        }
     }
     
 }
