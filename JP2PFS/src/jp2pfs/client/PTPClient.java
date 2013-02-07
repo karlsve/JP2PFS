@@ -4,6 +4,7 @@
  */
 package jp2pfs.client;
 
+import java.net.Socket;
 import java.net.SocketAddress;
 
 /**
@@ -17,6 +18,10 @@ public class PTPClient extends Thread {
     private SocketAddress ip;
     private String passwort;
     private int id;
+    private Socket ClientSocket = null;
+    
+    
+    
     
     public PTPClient(String name,int port, SocketAddress ip,String passwort)
     {
