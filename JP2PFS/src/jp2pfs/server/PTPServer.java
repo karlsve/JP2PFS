@@ -32,6 +32,10 @@ public class PTPServer extends Thread {
             this.sendError(this, 500, "Could not connect to server.");
         }
     }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
     
     public PTPClient addClient(String name, SocketAddress ip, int port) {
         return null;
@@ -55,6 +59,18 @@ public class PTPServer extends Thread {
     
     public List<PTPClient> getClientsOnline() {
         return null;
+    }
+    
+    public void addListener(PTPServerListener listener) {
+        if(!serverListener.contains(listener)) {
+            serverListener.add(listener);
+        }
+    }
+    
+    public void removeListener(PTPServerListener listener) {
+        if(serverListener.contains(listener)) {
+            serverListener.remove(listener);
+        }
     }
     
     public void sendError(Object sender, int code, String message) {
