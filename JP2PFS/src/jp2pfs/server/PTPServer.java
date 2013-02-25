@@ -15,31 +15,44 @@ import jp2pfs.client.PTPClient;
  *
  * @author karlinsv
  */
-public class PTPServer extends Thread {
+public class PTPServer implements Runnable {
     
-    ServerSocket connection = null;
-    int port = 0;
-    boolean run;
+    private ServerSocket connection = null;
+    private int port = 0;
+    //private int timeout = 5000;
+    
+    private boolean run = true;
     
     List<PTPServerListener> serverListener = new ArrayList<PTPServerListener>();
     
     public PTPServer(int port) {
         this.port = port;
-        this.init();
     }
     
     private void init() {
         try {
             this.connection = new ServerSocket(this.port);
+            //this.connection.setSoTimeout(this.timeout);
+            this.sendMessage(this, 100, "Server connection established.");
         } catch(Exception e) {
-            this.sendError(this, 500, "Could not connect to server.");
+            this.sendError(this, 500, "Could not establish server connection.");
         }
         while(run) {
             try {
                 Socket client = this.connection.accept();
+                this.sendMessage(this, 100, "Connection to client established.");
             }catch(Exception e) {
                 this.sendError(this, 404, "Could not establish connection to client.");
             }
+        }
+    }
+    
+    public void stop() {
+        run = false;
+        try {
+            this.connection.close();
+        } catch (Exception e) {
+            this.sendError(this, 600, "Could not close the server connection.");
         }
     }
 
@@ -89,6 +102,18 @@ public class PTPServer extends Thread {
             if(listener != null)
                 listener.onError(error);
         }
+    }
+
+    private void sendMessage(Object sender, int code, String message) {
+        for(PTPServerListener listener : serverListener) {
+            if(listener != null)
+                listener.onMessage(message);
+        }
+    }
+
+    @Override
+    public void run() {
+        this.init();
     }
     
 }
