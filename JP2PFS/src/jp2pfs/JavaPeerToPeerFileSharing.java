@@ -9,7 +9,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.JFrame;
 import jp2pfs.server.PTPServer;
-import jp2pfs.server.PTPServerError;
+import jp2pfs.server.PTPServerMessage;
 import jp2pfs.server.PTPServerListener;
 
 /**
@@ -31,18 +31,11 @@ public class JavaPeerToPeerFileSharing {
     PTPServerListener serverlistener = new PTPServerListener() {
 
         @Override
-        public void onMessage(String message) {
+        public void onMessage(PTPServerMessage message) {
             if(frame.isVisible()) {
-                textarea.append(message);
-            }
-        }
-
-        @Override
-        public void onError(PTPServerError error) {
-            if(frame.isVisible()) {
-                textarea.append(error.getMessage() + "\n");
+                textarea.append(message.getMessage() + "\n");
             } else {
-                System.out.println(error.getMessage());
+                System.out.println(message.getMessage());
             }
         }
     };

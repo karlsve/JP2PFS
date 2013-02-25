@@ -8,15 +8,19 @@ package jp2pfs.server;
  *
  * @author karlinsv
  */
-public class PTPServerError {
+public class PTPServerMessage {
+    
+    public enum PTPServerMessageCode {
+        SUCCESS, SERVER_CONNECTION_ERROR, CLIENT_CONNECTION_ERROR, SERVER_CONNECTION_CLOSE_ERROR
+    }
 
     private Object sender = null;
-    private int code = 0;
+    private PTPServerMessageCode messageCode;
     private String message = "No message.";
 
-    public PTPServerError(Object sender, int code, String message) {
+    public PTPServerMessage(Object sender, PTPServerMessageCode messageCode, String message) {
         this.sender = sender;
-        this.code = code;
+        this.messageCode = messageCode;
         this.message = message;
     }
     
@@ -24,8 +28,8 @@ public class PTPServerError {
         return sender;
     }
     
-    public int getCode() {
-        return code;
+    public PTPServerMessageCode getMessageCode() {
+        return messageCode;
     }
     
     public String getMessage() {
