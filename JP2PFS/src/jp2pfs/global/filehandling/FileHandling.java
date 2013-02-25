@@ -88,13 +88,11 @@ public class FileHandling {
             
             outputStream.close();
             sendMessage(this, FileHandlingMessageCode.SUCCESS, "File received.");
-            
+            return true;
         } catch(Exception e) {
             sendMessage(this, FileHandlingMessageCode.FILE_RECEIVE_ERROR, "Could not receive file.");
             return false;
         }
-        sendMessage(this, FileHandlingMessageCode.SUCCESS, "File received.");
-        return true;
     }
 
     private void sendMessage(FileHandling sender, FileHandlingMessageCode code, String content) {
