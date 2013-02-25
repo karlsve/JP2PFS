@@ -14,13 +14,13 @@ import jp2pfs.global.DatabaseHandling;
 public class PTPClientDatabase extends DatabaseHandling {
 
     @Override
-    public boolean connect(String filename, String user, String password) throws SQLException, ClassNotFoundException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public boolean connect() {
+        return false;
     }
 
     @Override
     public void disconnect() {
-        throw new UnsupportedOperationException("Not supported yet.");
+       
     }
     
 }
