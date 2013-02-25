@@ -6,21 +6,26 @@ package jp2pfs.client;
 
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.util.ArrayList;
+import java.util.List;
+;
 
 /**
  *
  * @author karlinsv
  */
-public class PTPClient extends Thread {
+public class PTPClient implements Runnable{
     
     private String name;
     private int port;
     private SocketAddress ip;
     private String passwort;
     private int id;
-    private Socket ClientSocket = null;
+    private Socket clientSocket = null;
+    private boolean run = true;
     
     
+    List<PTPClientListener> clientListener = new ArrayList<PTPClientListener>();
     
     
     public PTPClient(String name,int port, SocketAddress ip,String passwort)
@@ -68,8 +73,49 @@ public class PTPClient extends Thread {
     {
         return port;
     }
+
     
     
+    private void init()
+    {
+        try {
+            clientSocket = new Socket(this.ip.toString(), this.port);
+            this.sendMessage(this, 100, "Server connection established.");
+        } catch(Exception e) {
+            this.sendError(this, 500, "Could not establish server connection.");
+        }   
+            
+    }
     
+    @Override
+    public void run() {
+        this.init();
+    }
+    
+    private void connect(SocketAddress addr)
+    {   
+        connect(getClientIp());
+    }
+    
+    public void addListener(PTPClientListener listener) {
+        if(!clientListener.contains(listener)) {
+           clientListener.add(listener);
+        }
+    }
+    
+    public void removeListener(PTPClientListener listener) {
+        if(clientListener.contains(listener)) {
+            clientListener.remove(listener);
+        }
+    }
+    
+    
+
+    private void sendMessage(Object sender, int code, String message) {
+        for(PTPClientListener listener : clientListener) {
+            if(listener != null)
+                listener.onMessage(message);
+        }
+    }
     
 }
