@@ -13,7 +13,7 @@ public abstract class DatabaseHandling {
     protected Connection con;
     
     
-    abstract public boolean connect(String filename,String user, String password)throws SQLException, ClassNotFoundException;
+    abstract public boolean connect();
     abstract public void disconnect();
     
         
