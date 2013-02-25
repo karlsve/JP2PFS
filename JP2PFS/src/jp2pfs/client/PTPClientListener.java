@@ -9,6 +9,5 @@ package jp2pfs.client;
  * @author Foertsan
  */
 public interface PTPClientListener {
-    public void onMessage(String message);
-    public void onError(PTPClientMessage error);
+    public void onMessage(PTPClientMessage message);
 }

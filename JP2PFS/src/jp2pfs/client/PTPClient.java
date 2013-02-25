@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.List;
+import jp2pfs.client.PTPClientMessage.PTPClientMessageCode;
 ;
 
 /**
@@ -80,9 +81,9 @@ public class PTPClient implements Runnable{
     {
         try {
             clientSocket = new Socket(this.ip.toString(), this.port);
-            this.sendMessage(this, 100, "Server connection established.");
+            this.sendMessage(this, PTPClientMessageCode.SUCCESS, "Connection to server established.");
         } catch(Exception e) {
-            this.sendError(this, 500, "Could not establish server connection.");
+            this.sendMessage(this, PTPClientMessageCode.SERVER_CONNECTION_ERROR, "Connection to server could not be established.");
         }   
             
     }
@@ -111,7 +112,8 @@ public class PTPClient implements Runnable{
     
     
 
-    private void sendMessage(Object sender, int code, String message) {
+    private void sendMessage(Object sender, PTPClientMessageCode code, String content) {
+        PTPClientMessage message = new PTPClientMessage(sender, code, content);
         for(PTPClientListener listener : clientListener) {
             if(listener != null)
                 listener.onMessage(message);
