@@ -16,7 +16,7 @@ import jp2pfs.server.PTPServerListener;
  *
  * @author karlinsv
  */
-public class JavaPeerToPeerFileSharing implements PTPServerListener {
+public class JavaPeerToPeerFileSharing {
     
     JFrame frame = null;
     String title = "PTP";
@@ -27,6 +27,25 @@ public class JavaPeerToPeerFileSharing implements PTPServerListener {
     
     int serverport = 2100;
     PTPServer server = null;
+    
+    PTPServerListener serverlistener = new PTPServerListener() {
+
+        @Override
+        public void onMessage(String message) {
+            if(frame.isVisible()) {
+                textarea.append(message);
+            }
+        }
+
+        @Override
+        public void onError(PTPServerError error) {
+            if(frame.isVisible()) {
+                textarea.append(error.getMessage() + "\n");
+            } else {
+                System.out.println(error.getMessage());
+            }
+        }
+    };
     
     public static void main(String[] args) {
         new JavaPeerToPeerFileSharing();
@@ -64,7 +83,7 @@ public class JavaPeerToPeerFileSharing implements PTPServerListener {
     private void startServer() {
         if(server == null) {
             server = new PTPServer(serverport);
-            server.addListener(this);
+            server.addListener(serverlistener);
         }
         new Thread(server).start();
     }
@@ -72,22 +91,6 @@ public class JavaPeerToPeerFileSharing implements PTPServerListener {
     private void stopServer() {
         if(server != null) {
             server.stop();
-        }
-    }
-
-    @Override
-    public void onError(PTPServerError error) {
-        if(frame.isVisible()) {
-            textarea.append(error.getMessage() + "\r\n");
-        } else {
-            System.out.println(error.getMessage());
-        }
-    }
-
-    @Override
-    public void onMessage(String message) {
-        if(frame.isVisible()) {
-            textarea.append(message);
         }
     }
 }
