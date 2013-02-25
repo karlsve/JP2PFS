@@ -11,7 +11,7 @@ package jp2pfs.global.filehandling;
 class FileHandlingMessage {
 
     public enum FileHandlingMessageCode {
-        
+        SUCCESS, FILE_SEND_ERROR, FILE_RECEIVE_ERROR
     }
     
     private Object sender;
