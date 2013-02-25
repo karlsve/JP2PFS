@@ -6,21 +6,52 @@ package jp2pfs.server;
 
 import java.sql.SQLException;
 import jp2pfs.global.DatabaseHandling;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
 
 /**
  *
  * @author karlinsv
  */
 public class PTPServerDatabase extends DatabaseHandling {
-
-    @Override
-    public boolean connect(String filename, String user, String password) throws SQLException, ClassNotFoundException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    
+    Connection connection=null;
+    String driverName="ocacle.jdbc.driver.OracleDriver";
+    
+    private String user;
+    private String password;
+    private String serverName;
+    private String portNummer;
+    private String sid;
+    public String url="jbc:oracle:thin:@"+serverName+":"+portNummer+":"+sid;
+    
+    public PTPServerDatabase(String servername, String user, String password,String portnummer,String sid)
+    {
+        this.serverName = servername;
+        this.sid=sid;
+        this.portNummer=portnummer;
+        this.user=user;
+        this.password=password;
     }
-
+    @Override
+    public boolean connect() {
+        try
+        {
+            Class.forName(driverName);
+            connection=DriverManager.getConnection(url,user,password);
+        }catch(Exception e)
+        {
+            return false;
+        }
+        return true;
+    }
     @Override
     public void disconnect() {
-        throw new UnsupportedOperationException("Not supported yet.");
+          connection=null;
     }
     
 }
