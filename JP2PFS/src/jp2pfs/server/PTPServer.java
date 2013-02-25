@@ -5,6 +5,7 @@
 package jp2pfs.server;
 
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,11 +19,13 @@ public class PTPServer extends Thread {
     
     ServerSocket connection = null;
     int port = 0;
+    boolean run;
     
     List<PTPServerListener> serverListener = new ArrayList<PTPServerListener>();
     
     public PTPServer(int port) {
         this.port = port;
+        this.init();
     }
     
     private void init() {
@@ -30,6 +33,13 @@ public class PTPServer extends Thread {
             this.connection = new ServerSocket(this.port);
         } catch(Exception e) {
             this.sendError(this, 500, "Could not connect to server.");
+        }
+        while(run) {
+            try {
+                Socket client = this.connection.accept();
+            }catch(Exception e) {
+                this.sendError(this, 404, "Could not establish connection to client.");
+            }
         }
     }
 
