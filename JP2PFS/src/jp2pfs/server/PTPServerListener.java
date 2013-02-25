@@ -9,6 +9,5 @@ package jp2pfs.server;
  * @author karlinsv
  */
 public interface PTPServerListener {
-    public void onMessage(String message);
-    public void onError(PTPServerError error);
+    public void onMessage(PTPServerMessage message);
 }
