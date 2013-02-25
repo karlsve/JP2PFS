@@ -4,10 +4,16 @@
  */
 package jp2pfs.client;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import jp2pfs.client.PTPClientMessage.PTPClientMessageCode;
 ;
 
@@ -35,6 +41,10 @@ public class PTPClient implements Runnable{
         this.port = port;
         this.ip = ip;
         this.passwort = passwort;
+    }
+    
+    public PTPClient(Socket connection) {
+        
     }
     
     public void setClientName(String name)
@@ -83,9 +93,29 @@ public class PTPClient implements Runnable{
             clientSocket = new Socket(this.ip.toString(), this.port);
             this.sendMessage(this, PTPClientMessageCode.SUCCESS, "Connection to server established.");
         } catch(Exception e) {
-            this.sendMessage(this, PTPClientMessageCode.SERVER_CONNECTION_ERROR, "Connection to server could not be established.");
-        }   
+            this.sendMessage(this, PTPClientMessageCode.CONNECTION_ERROR, "Connection to server could not be established.");
+        }
+    }
+    
+    private void receiveMessageClient() {
+        try {
+            BufferedReader inputStream = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            String message = inputStream.readLine();
             
+            this.sendMessage(this, PTPClientMessageCode.MESSAGE_RECEIVE_SUCCESS, message);
+            
+        } catch (IOException ex) {
+            this.sendMessage(this, PTPClientMessageCode.MESSAGE_RECEIVE_ERROR, "Could not send the message.");
+        }
+    }
+    
+    public void sendMessageClient(String message) {
+        try {
+            PrintStream outputStream = new PrintStream(clientSocket.getOutputStream());
+            outputStream.println(message);
+        } catch (IOException ex) {
+            this.sendMessage(this, PTPClientMessageCode.MESSAGE_SEND_ERROR, "Could not send the message.");
+        }
     }
     
     @Override
@@ -95,7 +125,11 @@ public class PTPClient implements Runnable{
     
     private void connect(SocketAddress addr)
     {   
-        connect(getClientIp());
+        try {
+            clientSocket.connect(this.ip);
+        } catch (Exception ex) {
+            sendMessage(this, PTPClientMessageCode.CONNECTION_ERROR, "Could not establish connection to client.");
+        }
     }
     
     public void addListener(PTPClientListener listener) {

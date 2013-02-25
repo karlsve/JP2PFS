@@ -11,7 +11,7 @@ package jp2pfs.client;
 public class PTPClientMessage {
     
     public enum PTPClientMessageCode {
-        SUCCESS, SERVER_CONNECTION_ERROR, CLIENT_CONNECTION_ERROR, SERVER_CONNECTION_CLOSE_ERROR
+        SUCCESS, CONNECTION_ERROR, MESSAGE_RECEIVE_ERROR, MESSAGE_RECEIVE_SUCCESS, MESSAGE_SEND_ERROR, MESSAGE_SEND_SUCCESS
     }
     
     private Object sender = null;

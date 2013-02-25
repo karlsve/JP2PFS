@@ -6,7 +6,6 @@ package jp2pfs.server;
 
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import jp2pfs.client.PTPClient;
@@ -40,7 +39,9 @@ public class PTPServer implements Runnable {
         }
         while(run) {
             try {
-                Socket client = this.connection.accept();
+                Socket clientConnection = this.connection.accept();
+                PTPClient client = new PTPClient(clientConnection);
+                new Thread(client).start();
                 this.sendMessage(this, PTPServerMessageCode.SUCCESS, "Connection to client established.");
             }catch(Exception e) {
                 this.sendMessage(this, PTPServerMessageCode.CLIENT_CONNECTION_ERROR, "Could not establish connection to client.");
@@ -59,30 +60,6 @@ public class PTPServer implements Runnable {
 
     public void setPort(int port) {
         this.port = port;
-    }
-    
-    public PTPClient addClient(String name, SocketAddress ip, int port) {
-        return null;
-    }
-    
-    public void updateClient(PTPClient client) {
-        
-    }
-    
-    public boolean removeClient(PTPClient client) {
-        return false;
-    }
-    
-    public PTPClient getClient(int id) {
-        return null;
-    }
-    
-    public List<PTPClient> getClients() {
-        return null;
-    }
-    
-    public List<PTPClient> getClientsOnline() {
-        return null;
     }
     
     public void addListener(PTPServerListener listener) {
