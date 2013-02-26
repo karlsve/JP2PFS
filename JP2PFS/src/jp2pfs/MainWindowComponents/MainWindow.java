@@ -150,7 +150,7 @@ public class MainWindow extends javax.swing.JFrame {
         UserItem item = (UserItem)userList.getModel().getElementAt(index);
         UserPanel panel = new UserPanel(item);
         server.addClientListener(panel.getListener());
-        mainWindowTabPane.addTab(item.username, panel);
+        mainWindowTabPane.addTab(item.getUsername(), panel);
     }
     
     private void startServer() {

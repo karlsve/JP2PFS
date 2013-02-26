@@ -149,6 +149,7 @@ public class JavaPeerToPeerFileSharing {
 
             public void run() {
                 mainWindow = new MainWindow();
+                mainWindow.setTitle(title);
                 mainWindow.setVisible(true);
             }
         });

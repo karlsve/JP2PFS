@@ -4,12 +4,10 @@
  */
 package jp2pfs.MainWindowComponents;
 
+import jp2pfs.Chat.ChatMessage;
 import jp2pfs.client.PTPClient;
 import jp2pfs.client.PTPClientListener;
 import jp2pfs.client.PTPClientMessage;
-import jp2pfs.server.PTPServer;
-import jp2pfs.server.PTPServerListener;
-import jp2pfs.server.PTPServerMessage;
 
 /**
  *
@@ -33,6 +31,13 @@ public class UserPanel extends javax.swing.JPanel {
     public UserPanel(UserItem user) {
         this.user = user;
         initComponents();
+        initChat();
+    }
+    
+    private void initChat() {
+        for(ChatMessage message : user.getMessages()) {
+            UserChatTextArea.append(message.getContent()+"\n");
+        }
     }
     
     public PTPClientListener getListener() {
@@ -50,11 +55,10 @@ public class UserPanel extends javax.swing.JPanel {
                     UserChatTextArea.append("Du: "+message.getMessage()+"\n");
                     break;
                 case MESSAGE_SEND_ERROR:
-                    System.out.println(message.getMessage());
                     break;
                 case MESSAGE_RECEIVE_SUCCESS:
                     System.out.println("Message received.");
-                    UserChatTextArea.append(user.username+": "+message.getMessage()+"\n");
+                    UserChatTextArea.append(user.getUsername()+": "+message.getMessage()+"\n");
                     break;
                 case MESSAGE_RECEIVE_ERROR:
                     System.out.println(message.getMessage());
@@ -125,7 +129,7 @@ public class UserPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void UserChatSendMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_UserChatSendMouseClicked
-        PTPClient client = new PTPClient(user.port, user.ip, "karlsve", "");
+        PTPClient client = new PTPClient(user.getPort(), user.getIp(), "karlsve", "");
         client.addListener(clientListener);
         client.sendMessageClient(UserChatInput.getText());
         UserChatInput.setText("");

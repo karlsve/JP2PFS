@@ -4,6 +4,8 @@
  */
 package jp2pfs.client;
 
+import java.net.InetAddress;
+
 /**
  *
  * @author Foertsan
@@ -17,13 +19,24 @@ public class PTPClientMessage {
     private Object sender = null;
     private PTPClientMessageCode messageCode;
     private String message = "No message.";
+    private InetAddress ip = null;
 
     public PTPClientMessage(Object sender, PTPClientMessageCode messageCode, String message) {
         this.sender = sender;
         this.messageCode = messageCode;
         this.message = message;
     }
+
+    public InetAddress getIp() {
+        return ip;
+    }
     
+    public PTPClientMessage(Object sender, PTPClientMessageCode messageCode, String message, InetAddress ip) {
+        this.sender = sender;
+        this.messageCode = messageCode;
+        this.message = message;
+        this.ip = ip;
+    }
     public Object getSender() {
         return sender;
     }
