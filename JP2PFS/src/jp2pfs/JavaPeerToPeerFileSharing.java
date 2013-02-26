@@ -7,10 +7,17 @@ package jp2pfs;
 import java.awt.TextArea;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
+import jp2pfs.client.PTPClient;
+import jp2pfs.client.PTPClientListener;
+import jp2pfs.client.PTPClientMessage;
 import jp2pfs.server.PTPServer;
-import jp2pfs.server.PTPServerMessage;
 import jp2pfs.server.PTPServerListener;
+import jp2pfs.server.PTPServerMessage;
 
 /**
  *
@@ -28,15 +35,19 @@ public class JavaPeerToPeerFileSharing {
     int serverport = 2100;
     PTPServer server = null;
     
-    PTPServerListener serverlistener = new PTPServerListener() {
+    PTPServerListener serverListener = new PTPServerListener() {
 
         @Override
         public void onMessage(PTPServerMessage message) {
-            if(frame.isVisible()) {
-                textarea.append(message.getMessage() + "\n");
-            } else {
-                System.out.println(message.getMessage());
-            }
+            doOnServerMessage(message);
+        }
+    };
+    
+    PTPClientListener clientListener = new PTPClientListener() {
+
+        @Override
+        public void onMessage(PTPClientMessage message) {
+            doOnClientMessage(message);
         }
     };
     
@@ -47,6 +58,7 @@ public class JavaPeerToPeerFileSharing {
     public JavaPeerToPeerFileSharing() {
         initLayout();
         startServer();
+        startClient();
     }
 
     private void initLayout() {
@@ -76,7 +88,8 @@ public class JavaPeerToPeerFileSharing {
     private void startServer() {
         if(server == null) {
             server = new PTPServer(serverport);
-            server.addListener(serverlistener);
+            server.addServerListener(serverListener);
+            server.addClientListener(clientListener);
         }
         new Thread(server).start();
     }
@@ -84,6 +97,39 @@ public class JavaPeerToPeerFileSharing {
     private void stopServer() {
         if(server != null) {
             server.stop();
+        }
+    }
+    
+    private void doOnServerMessage(PTPServerMessage message) {
+        
+    }
+
+    private void startClient() {
+        try {
+            for(int i = 0; i<400; i++) {
+                PTPClient client = new PTPClient("localhost", serverport, InetAddress.getLocalHost(), "");
+                client.addListener(clientListener);
+                client.sendMessageClient("QWERTYUIOP");
+            }
+        } catch (UnknownHostException ex) {
+        }
+    }
+
+    private void doOnClientMessage(PTPClientMessage message) {
+        if(message.getSender() instanceof PTPClient) {
+            PTPClient client = (PTPClient) message.getSender();
+            switch(message.getMessageCode()) {
+                case CONNECTION_SUCCESS:
+                    
+                    break;
+                case MESSAGE_SEND_SUCCESS:
+                    System.out.println(message.getMessage());
+                    break;
+                case MESSAGE_RECEIVE_SUCCESS:
+                    System.out.println("Message received.");
+                    textarea.append(message.getMessage()+"\n");
+                    break;
+            }
         }
     }
 }
