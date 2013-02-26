@@ -61,7 +61,7 @@ public class JavaPeerToPeerFileSharing {
     public JavaPeerToPeerFileSharing() {
         //initLayout();
         initMainWindow();
-        startServer();
+        //startServer();
         //startClient();
     }
 

@@ -12,6 +12,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
+import jp2pfs.server.PTPServer;
+import jp2pfs.server.PTPServerListener;
+import jp2pfs.server.PTPServerMessage;
 
 /**
  *
@@ -19,6 +22,18 @@ import javax.swing.JList;
  */
 public class MainWindow extends javax.swing.JFrame {
 
+    
+    private PTPServer server = null;
+    int serverport = 2100;
+    
+    PTPServerListener serverListener = new PTPServerListener() {
+
+        @Override
+        public void onMessage(PTPServerMessage message) {
+            
+        }
+    };
+    
     /**
      * Creates new form MainWindow
      */
@@ -104,6 +119,7 @@ public class MainWindow extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
     private void init() {
+        startServer();
         initUserList();
     }
 
@@ -124,7 +140,7 @@ public class MainWindow extends javax.swing.JFrame {
         try {
             list.addElement(new UserItem("Marvin Middel", InetAddress.getByName("172.30.64.19"), 2100));
             list.addElement(new UserItem("Andreas Förtsch", InetAddress.getByName("172.30.64.150"), 2100));
-            list.addElement(new UserItem("Sven Karliner", InetAddress.getLocalHost(), 2100));
+            list.addElement(new UserItem("Sven Karliner", InetAddress.getByName("172.30.64.20"), 2100));
         } catch (UnknownHostException ex) {
             Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -133,6 +149,21 @@ public class MainWindow extends javax.swing.JFrame {
     private void createTabUser(int index) {
         UserItem item = (UserItem)userList.getModel().getElementAt(index);
         UserPanel panel = new UserPanel(item);
+        server.addClientListener(panel.getListener());
         mainWindowTabPane.addTab(item.username, panel);
+    }
+    
+    private void startServer() {
+        if(server == null) {
+            server = new PTPServer(serverport);
+            server.addServerListener(serverListener);
+        }
+        new Thread(server).start();
+    }
+
+    private void stopServer() {
+        if(server != null) {
+            server.stop();
+        }
     }
 }

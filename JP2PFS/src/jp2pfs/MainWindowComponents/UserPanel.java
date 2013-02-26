@@ -4,11 +4,12 @@
  */
 package jp2pfs.MainWindowComponents;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import jp2pfs.client.PTPClient;
 import jp2pfs.client.PTPClientListener;
 import jp2pfs.client.PTPClientMessage;
+import jp2pfs.server.PTPServer;
+import jp2pfs.server.PTPServerListener;
+import jp2pfs.server.PTPServerMessage;
 
 /**
  *
@@ -32,6 +33,10 @@ public class UserPanel extends javax.swing.JPanel {
     public UserPanel(UserItem user) {
         this.user = user;
         initComponents();
+    }
+    
+    public PTPClientListener getListener() {
+        return this.clientListener;
     }
 
     private void doOnClientMessage(PTPClientMessage message) {
