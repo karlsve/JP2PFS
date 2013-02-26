@@ -9,6 +9,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import jp2pfs.client.PTPClient;
+import jp2pfs.client.PTPClientListener;
 import jp2pfs.server.PTPServerMessage.PTPServerMessageCode;
 
 /**
@@ -24,6 +25,7 @@ public class PTPServer implements Runnable {
     private boolean run = true;
     
     List<PTPServerListener> serverListener = new ArrayList<PTPServerListener>();
+    List<PTPClientListener> clientListener = new ArrayList<PTPClientListener>();
     
     public PTPServer(int port) {
         this.port = port;
@@ -41,10 +43,11 @@ public class PTPServer implements Runnable {
             try {
                 Socket clientConnection = this.connection.accept();
                 PTPClient client = new PTPClient(clientConnection);
-                new Thread(client).start();
+                client.addListenerSet(clientListener);
+                client.receiveMessageClient();
                 this.sendMessage(this, PTPServerMessageCode.SUCCESS, "Connection to client established.");
             }catch(Exception e) {
-                this.sendMessage(this, PTPServerMessageCode.CLIENT_CONNECTION_ERROR, "Could not establish connection to client.");
+                this.sendMessage(this, PTPServerMessageCode.CLIENT_CONNECTION_ERROR, e.getMessage());
             }
         }
     }
@@ -62,15 +65,27 @@ public class PTPServer implements Runnable {
         this.port = port;
     }
     
-    public void addListener(PTPServerListener listener) {
+    public void addServerListener(PTPServerListener listener) {
         if(!serverListener.contains(listener)) {
             serverListener.add(listener);
         }
     }
     
-    public void removeListener(PTPServerListener listener) {
+    public void removeServerListener(PTPServerListener listener) {
         if(serverListener.contains(listener)) {
             serverListener.remove(listener);
+        }
+    }
+    
+    public void addClientListener(PTPClientListener listener) {
+        if(!clientListener.contains(listener)) {
+            clientListener.add(listener);
+        }
+    }
+    
+    public void removeClientListener(PTPClientListener listener) {
+        if(clientListener.contains(listener)) {
+            clientListener.remove(listener);
         }
     }
 

@@ -8,12 +8,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.net.InetAddress;
 import java.net.Socket;
-import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import jp2pfs.client.PTPClientMessage.PTPClientMessageCode;
 ;
 
@@ -21,11 +19,11 @@ import jp2pfs.client.PTPClientMessage.PTPClientMessageCode;
  *
  * @author karlinsv
  */
-public class PTPClient implements Runnable{
+public class PTPClient {
     
     private String name;
     private int port;
-    private SocketAddress ip;
+    private InetAddress ip;
     private String passwort;
     private int id;
     private Socket clientSocket = null;
@@ -35,7 +33,7 @@ public class PTPClient implements Runnable{
     List<PTPClientListener> clientListener = new ArrayList<PTPClientListener>();
     
     
-    public PTPClient(String name,int port, SocketAddress ip,String passwort)
+    public PTPClient(String name, int port, InetAddress ip,String passwort)
     {
         this.name = name;
         this.port = port;
@@ -44,7 +42,7 @@ public class PTPClient implements Runnable{
     }
     
     public PTPClient(Socket connection) {
-        
+        clientSocket = connection;
     }
     
     public void setClientName(String name)
@@ -57,7 +55,7 @@ public class PTPClient implements Runnable{
         this.port = port;
     }
     
-    public void setClientIp(SocketAddress ip)
+    public void setClientIp(InetAddress ip)
     {
         this.ip = ip;
     }
@@ -75,7 +73,7 @@ public class PTPClient implements Runnable{
     {
         return name;
     }
-    public SocketAddress getClientIp()
+    public InetAddress getClientIp()
     {
        return ip;
     }
@@ -84,57 +82,63 @@ public class PTPClient implements Runnable{
     {
         return port;
     }
-
     
-    
-    private void init()
+    private void connect()
     {
-        try {
-            clientSocket = new Socket(this.ip.toString(), this.port);
-            this.sendMessage(this, PTPClientMessageCode.SUCCESS, "Connection to server established.");
-        } catch(Exception e) {
-            this.sendMessage(this, PTPClientMessageCode.CONNECTION_ERROR, "Connection to server could not be established.");
+        if(clientSocket == null) {
+            try {
+                clientSocket = new Socket(this.ip.getHostAddress().toString(), this.port);
+                this.sendMessage(this, PTPClientMessageCode.CONNECTION_SUCCESS, "Connection to server established.");
+            } catch(Exception e) {
+                this.sendMessage(this, PTPClientMessageCode.CONNECTION_ERROR, "Connection to server could not be established.");
+            }
         }
     }
     
-    private void receiveMessageClient() {
-        try {
-            BufferedReader inputStream = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            String message = inputStream.readLine();
-            
-            this.sendMessage(this, PTPClientMessageCode.MESSAGE_RECEIVE_SUCCESS, message);
-            
-        } catch (IOException ex) {
-            this.sendMessage(this, PTPClientMessageCode.MESSAGE_RECEIVE_ERROR, "Could not send the message.");
+    public void receiveMessageClient() {
+        if(clientSocket != null) {
+            try {
+                BufferedReader inputStream = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                String message = inputStream.readLine();
+                this.sendMessage(this, PTPClientMessageCode.MESSAGE_RECEIVE_SUCCESS, message);
+            } catch (IOException ex) {
+                this.sendMessage(this, PTPClientMessageCode.MESSAGE_RECEIVE_ERROR, "Could not send the message.");
+            }
         }
     }
     
     public void sendMessageClient(String message) {
+        
+        if(clientSocket == null) {
+            this.connect();
+        }
         try {
             PrintStream outputStream = new PrintStream(clientSocket.getOutputStream());
             outputStream.println(message);
-        } catch (IOException ex) {
+            this.sendMessage(this, PTPClientMessageCode.MESSAGE_SEND_SUCCESS, "Message sent.");
+        } catch (Exception ex) {
             this.sendMessage(this, PTPClientMessageCode.MESSAGE_SEND_ERROR, "Could not send the message.");
         }
     }
     
-    @Override
-    public void run() {
-        this.init();
-    }
-    
-    private void connect(SocketAddress addr)
-    {   
+    public void stop() {
+        run = false;
         try {
-            clientSocket.connect(this.ip);
+            clientSocket.close();
         } catch (Exception ex) {
-            sendMessage(this, PTPClientMessageCode.CONNECTION_ERROR, "Could not establish connection to client.");
+            sendMessage(this, PTPClientMessageCode.CLOSE_ERROR, "Could not close connection to server.");
         }
     }
     
     public void addListener(PTPClientListener listener) {
         if(!clientListener.contains(listener)) {
            clientListener.add(listener);
+        }
+    }
+    
+    public void addListenerSet(List<PTPClientListener> listenerSet) {
+        for(PTPClientListener listener : listenerSet) {
+            addListener(listener);
         }
     }
     
