@@ -8,10 +8,14 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
+import jp2pfs.Chat.ChatMessage;
+import jp2pfs.client.PTPClient;
+import jp2pfs.client.PTPClientListener;
+import jp2pfs.client.PTPClientMessage;
+import jp2pfs.global.IPHandling;
 import jp2pfs.server.PTPServer;
 import jp2pfs.server.PTPServerListener;
 import jp2pfs.server.PTPServerMessage;
@@ -26,12 +30,23 @@ public class MainWindow extends javax.swing.JFrame {
     private PTPServer server = null;
     int serverport = 2100;
     
+    UserItem self = null;
+    
     PTPServerListener serverListener = new PTPServerListener() {
 
         @Override
         public void onMessage(PTPServerMessage message) {
             
         }
+    };
+    
+    PTPClientListener clientListener = new PTPClientListener() {
+
+        @Override
+        public void onMessage(PTPClientMessage message) {
+            onClientMessage(message);
+        }
+        
     };
     
     /**
@@ -119,8 +134,21 @@ public class MainWindow extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
     private void init() {
+        initUser();
         startServer();
         initUserList();
+    }
+
+    private void initUser() {
+        List<InetAddress> localip = IPHandling.getLocalIpList();
+        for(int i = 0; i<userList.getModel().getSize(); i++) {
+            UserItem current = (UserItem)userList.getModel().getElementAt(i);
+            for(InetAddress ip : localip) {
+                if(current.getIp().equals(ip)) {
+                    self = current;
+                }
+            }
+        }
     }
 
     private void initUserList() {
@@ -138,25 +166,32 @@ public class MainWindow extends javax.swing.JFrame {
         });
         DefaultListModel<UserItem> list = (DefaultListModel<UserItem>)userList.getModel();
         try {
-            list.addElement(new UserItem("Marvin Middel", InetAddress.getByName("172.30.64.19"), 2100));
-            list.addElement(new UserItem("Andreas Förtsch", InetAddress.getByName("172.30.64.150"), 2100));
-            list.addElement(new UserItem("Sven Karliner", InetAddress.getByName("172.30.64.20"), 2100));
+            UserItem user = new UserItem("Marvin Middel", InetAddress.getByName("172.30.64.19"), 2100);
+            list.addElement(user);
+            user = new UserItem("Andreas Förtsch", InetAddress.getByName("172.30.64.150"), 2100);
+            list.addElement(user);
+            user = new UserItem("Sven Karliner", InetAddress.getByName("172.30.64.20"), 2100);
+            list.addElement(user);
         } catch (UnknownHostException ex) {
-            Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println(ex.getMessage());
         }
     }
     
-    private void createTabUser(int index) {
-        UserItem item = (UserItem)userList.getModel().getElementAt(index);
-        UserPanel panel = new UserPanel(item);
-        server.addClientListener(panel.getListener());
-        mainWindowTabPane.addTab(item.getUsername(), panel);
+    private void createTabUser(int userindex) {
+        UserItem item = (UserItem)userList.getModel().getElementAt(userindex);
+        UserPanel panel = new UserPanel(self, item);
+        if(mainWindowTabPane.indexOfComponent(panel) < 0) {
+            mainWindowTabPane.addTab(item.getUsername(), panel);
+        }
+        item.setTabIndex(mainWindowTabPane.indexOfComponent(panel));
+        mainWindowTabPane.setSelectedIndex(item.getTabIndex());
     }
     
     private void startServer() {
         if(server == null) {
             server = new PTPServer(serverport);
             server.addServerListener(serverListener);
+            server.addClientListener(clientListener);
         }
         new Thread(server).start();
     }
@@ -164,6 +199,38 @@ public class MainWindow extends javax.swing.JFrame {
     private void stopServer() {
         if(server != null) {
             server.stop();
+        }
+    }
+    
+    private void onClientMessage(PTPClientMessage message) {
+        if(message.getSender() instanceof PTPClient) {
+            PTPClient client = (PTPClient) message.getSender();
+            List<UserItem> list = (List<UserItem>) userList.getModel();
+            switch(message.getMessageCode()) {
+                case MESSAGE_SEND_SUCCESS:
+                    for(UserItem user : list) {
+                        if(message.getTo().equals(user.getIp())) {
+                            user.addMessage(new ChatMessage(message.getFrom(), message.getTo(), message.getMessage()));
+                        }
+                    }
+                    break;
+                case MESSAGE_RECEIVE_SUCCESS:
+                    for(UserItem user : list) {
+                        if(message.getFrom().equals(user.getIp())) {
+                            ChatMessage chatMessage = new ChatMessage(message.getFrom(), message.getTo(), message.getMessage());
+                            user.addMessage(chatMessage);
+                            if(user.getTabIndex() != 0) {
+                                ((UserPanel)mainWindowTabPane.getTabComponentAt(user.getTabIndex())).addMessage(chatMessage);
+                            }
+                            break;
+                        }
+                    }
+                    break;
+                default:
+                    System.out.println(message.getMessage());
+                    break;
+                    
+            }
         }
     }
 }

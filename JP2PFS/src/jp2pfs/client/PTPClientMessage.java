@@ -5,6 +5,7 @@
 package jp2pfs.client;
 
 import java.net.InetAddress;
+import jp2pfs.MainWindowComponents.UserItem;
 
 /**
  *
@@ -19,23 +20,29 @@ public class PTPClientMessage {
     private Object sender = null;
     private PTPClientMessageCode messageCode;
     private String message = "No message.";
-    private InetAddress ip = null;
+    private UserItem from = null;
+    private UserItem to = null;
+
+    public UserItem getFrom() {
+        return from;
+    }
+
+    public UserItem getTo() {
+        return to;
+    }
 
     public PTPClientMessage(Object sender, PTPClientMessageCode messageCode, String message) {
         this.sender = sender;
         this.messageCode = messageCode;
         this.message = message;
     }
-
-    public InetAddress getIp() {
-        return ip;
-    }
     
-    public PTPClientMessage(Object sender, PTPClientMessageCode messageCode, String message, InetAddress ip) {
+    public PTPClientMessage(Object sender, PTPClientMessageCode messageCode, String message, UserItem to, UserItem from) {
         this.sender = sender;
         this.messageCode = messageCode;
         this.message = message;
-        this.ip = ip;
+        this.from = from;
+        this.to = to;
     }
     public Object getSender() {
         return sender;

@@ -19,18 +19,26 @@ import jp2pfs.client.PTPClientMessage;
 public class UserItem {
     
     private String username = "";
+    private String password = "";
     private InetAddress ip = null;
     private int port = 0;
+    private int tabIndex = 0;
+
+    public int getTabIndex() {
+        return tabIndex;
+    }
+
+    public void setTabIndex(int tabIndex) {
+        this.tabIndex = tabIndex;
+    }
+
+    public String getPassword() {
+        return password;
+    }
     
     private List<ChatMessage> messages = new ArrayList<ChatMessage>();
     
-    private PTPClientListener clientListener = new PTPClientListener() {
-
-        @Override
-        public void onMessage(PTPClientMessage message) {
-            doOnClientMessage(message);
-        }
-    };
+    private PTPClientListener clientListener = null;
 
     public PTPClientListener getClientListener() {
         return clientListener;
@@ -43,6 +51,10 @@ public class UserItem {
     public List<ChatMessage> getMessages() {
         return messages;
     }
+    
+    public void addMessage(ChatMessage message) {
+        messages.add(message);
+    }
 
     public int getPort() {
         return port;
@@ -51,31 +63,12 @@ public class UserItem {
     public String getUsername() {
         return username;
     }
-
-    private void doOnClientMessage(PTPClientMessage message) {
-        if(message.getSender() instanceof PTPClient) {
-            PTPClient client = (PTPClient) message.getSender();
-            if(message.getIp() != null) {
-                switch(message.getMessageCode()) {
-                    case CONNECTION_SUCCESS:
-
-                        break;
-                    case MESSAGE_SEND_SUCCESS:
-                        messages.add(new ChatMessage(ip, message.getMessage()));
-                        break;
-                    case MESSAGE_SEND_ERROR:
-                        System.out.println(message.getMessage());
-                        break;
-                    case MESSAGE_RECEIVE_SUCCESS:
-                        System.out.println("Message received.");
-                        messages.add(new ChatMessage(ip, message.getMessage()));
-                        break;
-                    case MESSAGE_RECEIVE_ERROR:
-                        System.out.println(message.getMessage());
-                        break;
-                }
-            }
-        }
+    
+    public UserItem(String username, String password, InetAddress ip, int port) {
+        this.username = username;
+        this.password = password;
+        this.ip = ip;
+        this.port = port;
     }
     
     public UserItem(String username, InetAddress ip, int port) {

@@ -6,8 +6,6 @@ package jp2pfs.MainWindowComponents;
 
 import jp2pfs.Chat.ChatMessage;
 import jp2pfs.client.PTPClient;
-import jp2pfs.client.PTPClientListener;
-import jp2pfs.client.PTPClientMessage;
 
 /**
  *
@@ -15,56 +13,37 @@ import jp2pfs.client.PTPClientMessage;
  */
 public class UserPanel extends javax.swing.JPanel {
 
-    private UserItem user = null;
+    private UserItem to = null;
+    private UserItem from = null;
     
-    PTPClientListener clientListener = new PTPClientListener() {
-
-        @Override
-        public void onMessage(PTPClientMessage message) {
-            doOnClientMessage(message);
-        }
-    };
+    public UserItem getTo() {
+        return to;
+    }
+    
+    public UserItem getFrom() {
+        return from;
+    }
     
     /**
      * Creates new form UserPanel
      */
-    public UserPanel(UserItem user) {
-        this.user = user;
+    public UserPanel(UserItem from, UserItem to) {
+        this.to = to;
+        this.from = from;
         initComponents();
         initChat();
     }
     
     private void initChat() {
-        for(ChatMessage message : user.getMessages()) {
-            UserChatTextArea.append(message.getContent()+"\n");
+        if(from != null) {
+            for(ChatMessage message : from.getMessages()) {
+                UserChatTextArea.append(from.getUsername()+": "+message.getContent()+"\n");
+            }
         }
     }
     
-    public PTPClientListener getListener() {
-        return this.clientListener;
-    }
-
-    private void doOnClientMessage(PTPClientMessage message) {
-        if(message.getSender() instanceof PTPClient) {
-            PTPClient client = (PTPClient) message.getSender();
-            switch(message.getMessageCode()) {
-                case CONNECTION_SUCCESS:
-                    
-                    break;
-                case MESSAGE_SEND_SUCCESS:
-                    UserChatTextArea.append("Du: "+message.getMessage()+"\n");
-                    break;
-                case MESSAGE_SEND_ERROR:
-                    break;
-                case MESSAGE_RECEIVE_SUCCESS:
-                    System.out.println("Message received.");
-                    UserChatTextArea.append(user.getUsername()+": "+message.getMessage()+"\n");
-                    break;
-                case MESSAGE_RECEIVE_ERROR:
-                    System.out.println(message.getMessage());
-                    break;
-            }
-        }
+    public void addMessage(ChatMessage message) {
+        UserChatTextArea.append(message.getFrom()+": "+message.getContent());
     }
 
     /**
@@ -129,8 +108,8 @@ public class UserPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void UserChatSendMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_UserChatSendMouseClicked
-        PTPClient client = new PTPClient(user.getPort(), user.getIp(), "karlsve", "");
-        client.addListener(clientListener);
+        PTPClient client = new PTPClient(to, from);
+        client.addListener(from.getClientListener());
         client.sendMessageClient(UserChatInput.getText());
         UserChatInput.setText("");
     }//GEN-LAST:event_UserChatSendMouseClicked

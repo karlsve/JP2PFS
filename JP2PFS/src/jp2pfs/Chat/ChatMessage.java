@@ -4,7 +4,7 @@
  */
 package jp2pfs.Chat;
 
-import java.net.InetAddress;
+import jp2pfs.MainWindowComponents.UserItem;
 
 /**
  *
@@ -12,18 +12,23 @@ import java.net.InetAddress;
  */
 public class ChatMessage {
     
-    private InetAddress from;
+    private UserItem from;
+    private UserItem to;
     private String content;
 
     public String getContent() {
         return content;
     }
+    
+    public UserItem getTo() {
+        return to;
+    }
 
-    public InetAddress getFrom() {
+    public UserItem getFrom() {
         return from;
     }
     
-    public ChatMessage(InetAddress from, String content) {
+    public ChatMessage(UserItem from, UserItem to, String content) {
         this.from = from;
         this.content = content;
     }

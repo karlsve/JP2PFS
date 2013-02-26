@@ -109,14 +109,6 @@ public class JavaPeerToPeerFileSharing {
     }
 
     private void startClient() {
-        try {
-            for(int i = 0; i<900000 && frame.isVisible(); i++) {
-                PTPClient client = new PTPClient(serverport, InetAddress.getByName("172.30.64.19"), "karlsve", "");
-                client.addListener(clientListener);
-                client.sendMessageClient(i+": SPAM");
-            }
-        } catch (UnknownHostException ex) {
-        }
     }
 
     private void doOnClientMessage(PTPClientMessage message) {
