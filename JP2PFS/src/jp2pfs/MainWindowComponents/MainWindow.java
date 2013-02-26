@@ -12,6 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
+import javax.swing.SwingUtilities;
 import jp2pfs.server.PTPServer;
 import jp2pfs.server.PTPServerListener;
 import jp2pfs.server.PTPServerMessage;
@@ -121,6 +122,18 @@ public class MainWindow extends javax.swing.JFrame {
     private void init() {
         startServer();
         initUserList();
+        initTabPane();
+    }
+    
+    private void initTabPane(){
+        mainWindowTabPane.addMouseListener(new MouseAdapter(){
+        public void mouseClicked(final MouseEvent e) {
+        if (SwingUtilities.isRightMouseButton(e)) {
+            System.out.println("right mouse pressed");
+            mainWindowTabPane.removeTabAt(mainWindowTabPane.getSelectedIndex());
+        }
+    }
+    });
     }
 
     private void initUserList() {
