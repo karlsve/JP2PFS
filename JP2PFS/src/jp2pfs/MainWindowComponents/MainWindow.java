@@ -11,6 +11,7 @@ import java.net.UnknownHostException;
 import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
+import javax.swing.SwingUtilities;
 import jp2pfs.Chat.ChatMessage;
 import jp2pfs.client.PTPClient;
 import jp2pfs.client.PTPClientListener;
@@ -134,9 +135,23 @@ public class MainWindow extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
     private void init() {
-        initUser();
+        initTabPane();
         startServer();
         initUserList();
+        initUser();
+    }
+    
+    private void initTabPane() {
+        mainWindowTabPane.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(final MouseEvent e) {
+                if(SwingUtilities.isRightMouseButton(e)) {
+                    int index = mainWindowTabPane.getSelectedIndex();
+                    if(mainWindowTabPane.getTitleAt(index) != "Home") {
+                        mainWindowTabPane.removeTabAt(index);
+                    }
+                }
+            }
+        });
     }
 
     private void initUser() {
@@ -146,6 +161,7 @@ public class MainWindow extends javax.swing.JFrame {
             for(InetAddress ip : localip) {
                 if(current.getIp().equals(ip)) {
                     self = current;
+                    System.out.println(ip);
                 }
             }
         }
