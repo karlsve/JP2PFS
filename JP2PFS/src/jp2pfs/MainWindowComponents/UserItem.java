@@ -23,6 +23,10 @@ public class UserItem {
     private InetAddress ip = null;
     private int port = 0;
     private int tabIndex = 0;
+    
+    private List<ChatMessage> messages = new ArrayList<ChatMessage>();
+    
+    private PTPClientListener clientListener = null;
 
     public int getTabIndex() {
         return tabIndex;
@@ -35,10 +39,6 @@ public class UserItem {
     public String getPassword() {
         return password;
     }
-    
-    private List<ChatMessage> messages = new ArrayList<ChatMessage>();
-    
-    private PTPClientListener clientListener = null;
 
     public PTPClientListener getClientListener() {
         return clientListener;
@@ -71,10 +71,11 @@ public class UserItem {
         this.port = port;
     }
     
-    public UserItem(String username, InetAddress ip, int port) {
+    public UserItem(String username, InetAddress ip, int port, PTPClientListener listener) {
         this.username = username;
         this.ip = ip;
         this.port = port;
+        this.clientListener = listener;
     }
     
     public String toString() {

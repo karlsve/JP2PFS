@@ -182,11 +182,11 @@ public class MainWindow extends javax.swing.JFrame {
         });
         DefaultListModel<UserItem> list = (DefaultListModel<UserItem>)userList.getModel();
         try {
-            UserItem user = new UserItem("Marvin Middel", InetAddress.getByName("172.30.64.19"), 2100);
+            UserItem user = new UserItem("Marvin Middel", InetAddress.getByName("172.30.64.19"), 2100, clientListener);
             list.addElement(user);
-            user = new UserItem("Andreas Förtsch", InetAddress.getByName("172.30.64.150"), 2100);
+            user = new UserItem("Andreas Förtsch", InetAddress.getByName("172.30.64.150"), 2100, clientListener);
             list.addElement(user);
-            user = new UserItem("Sven Karliner", InetAddress.getByName("172.30.64.20"), 2100);
+            user = new UserItem("Sven Karliner", InetAddress.getByName("172.30.64.20"), 2100, clientListener);
             list.addElement(user);
         } catch (UnknownHostException ex) {
             System.out.println(ex.getMessage());
@@ -221,17 +221,19 @@ public class MainWindow extends javax.swing.JFrame {
     private void onClientMessage(PTPClientMessage message) {
         if(message.getSender() instanceof PTPClient) {
             PTPClient client = (PTPClient) message.getSender();
-            List<UserItem> list = (List<UserItem>) userList.getModel();
+            DefaultListModel<UserItem> list = (DefaultListModel<UserItem>) userList.getModel();
             switch(message.getMessageCode()) {
                 case MESSAGE_SEND_SUCCESS:
-                    for(UserItem user : list) {
+                    for(int i = 0; i<list.getSize(); i++) {
+                        UserItem user = list.getElementAt(i);
                         if(message.getTo().equals(user.getIp())) {
                             user.addMessage(new ChatMessage(message.getFrom(), message.getTo(), message.getMessage()));
                         }
                     }
                     break;
                 case MESSAGE_RECEIVE_SUCCESS:
-                    for(UserItem user : list) {
+                    for(int i = 0; i<list.getSize(); i++) {
+                        UserItem user = list.getElementAt(i);
                         if(message.getFrom().equals(user.getIp())) {
                             ChatMessage chatMessage = new ChatMessage(message.getFrom(), message.getTo(), message.getMessage());
                             user.addMessage(chatMessage);

@@ -30,20 +30,19 @@ public class UserPanel extends javax.swing.JPanel {
     public UserPanel(UserItem from, UserItem to) {
         this.to = to;
         this.from = from;
+        
         initComponents();
         initChat();
     }
     
     private void initChat() {
-        if(from != null) {
-            for(ChatMessage message : from.getMessages()) {
-                UserChatTextArea.append(from.getUsername()+": "+message.getContent()+"\n");
-            }
+        for(ChatMessage message : from.getMessages()) {
+            UserChatTextArea.append(from.getUsername()+": "+message.getContent()+"\n");
         }
     }
     
     public void addMessage(ChatMessage message) {
-        UserChatTextArea.append(message.getFrom()+": "+message.getContent());
+        UserChatTextArea.append(message.getFrom()+": "+message.getContent()+"\n");
     }
 
     /**
