@@ -33,9 +33,9 @@ public class PTPClient {
     List<PTPClientListener> clientListener = new ArrayList<PTPClientListener>();
     
     
-    public PTPClient(String name, int port, InetAddress ip,String passwort)
+    public PTPClient(int port, InetAddress ip, String username, String passwort)
     {
-        this.name = name;
+        this.name = username;
         this.port = port;
         this.ip = ip;
         this.passwort = passwort;
@@ -115,7 +115,7 @@ public class PTPClient {
         try {
             PrintStream outputStream = new PrintStream(clientSocket.getOutputStream());
             outputStream.println(message);
-            this.sendMessage(this, PTPClientMessageCode.MESSAGE_SEND_SUCCESS, "Message sent.");
+            this.sendMessage(this, PTPClientMessageCode.MESSAGE_SEND_SUCCESS, message);
         } catch (Exception ex) {
             this.sendMessage(this, PTPClientMessageCode.MESSAGE_SEND_ERROR, "Could not send the message.");
         }

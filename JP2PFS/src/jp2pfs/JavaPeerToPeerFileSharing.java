@@ -4,6 +4,7 @@
  */
 package jp2pfs;
 
+import jp2pfs.MainWindowComponents.MainWindow;
 import java.awt.TextArea;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -35,6 +36,8 @@ public class JavaPeerToPeerFileSharing {
     int serverport = 2100;
     PTPServer server = null;
     
+    MainWindow mainWindow = null;
+    
     PTPServerListener serverListener = new PTPServerListener() {
 
         @Override
@@ -56,9 +59,10 @@ public class JavaPeerToPeerFileSharing {
     }
     
     public JavaPeerToPeerFileSharing() {
-        initLayout();
+        //initLayout();
+        initMainWindow();
         startServer();
-        startClient();
+        //startClient();
     }
 
     private void initLayout() {
@@ -106,10 +110,10 @@ public class JavaPeerToPeerFileSharing {
 
     private void startClient() {
         try {
-            for(int i = 0; i<400; i++) {
-                PTPClient client = new PTPClient("localhost", serverport, InetAddress.getLocalHost(), "");
+            for(int i = 0; i<900000 && frame.isVisible(); i++) {
+                PTPClient client = new PTPClient(serverport, InetAddress.getByName("172.30.64.19"), "karlsve", "");
                 client.addListener(clientListener);
-                client.sendMessageClient("QWERTYUIOP");
+                client.sendMessageClient(i+": SPAM");
             }
         } catch (UnknownHostException ex) {
         }
@@ -123,13 +127,30 @@ public class JavaPeerToPeerFileSharing {
                     
                     break;
                 case MESSAGE_SEND_SUCCESS:
+                    System.out.println("Message sent.");
+                    textarea.append(message.getMessage()+"\n");
+                    break;
+                case MESSAGE_SEND_ERROR:
                     System.out.println(message.getMessage());
                     break;
                 case MESSAGE_RECEIVE_SUCCESS:
                     System.out.println("Message received.");
                     textarea.append(message.getMessage()+"\n");
                     break;
+                case MESSAGE_RECEIVE_ERROR:
+                    System.out.println(message.getMessage());
+                    break;
             }
         }
+    }
+
+    private void initMainWindow() {
+        java.awt.EventQueue.invokeLater(new Runnable() {
+
+            public void run() {
+                mainWindow = new MainWindow();
+                mainWindow.setVisible(true);
+            }
+        });
     }
 }
