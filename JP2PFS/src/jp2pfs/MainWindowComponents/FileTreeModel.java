@@ -5,7 +5,10 @@
 package jp2pfs.MainWindowComponents;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
+import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
@@ -16,50 +19,100 @@ import javax.swing.tree.TreePath;
  */
 public class FileTreeModel implements TreeModel {
     
-    List<Branch> tree = new ArrayList<Branch>();
+    Branch root = null;
+    
+    List<TreeModelListener> listener = new ArrayList<TreeModelListener>();
     
     public void addBranch(Branch parent, Branch branch) {
-         parent.add(branch);
+        if(parent != null) {
+            parent.add(branch);
+        } else {
+            root = branch;
+        }
     }
 
     @Override
     public Object getRoot() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return root;
     }
 
     @Override
     public Object getChild(Object parent, int index) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if(parent instanceof Branch) {
+            Branch parentBranch = (Branch) parent;
+            return parentBranch.getChildAt(index);
+        }
+        return null;
     }
 
     @Override
     public int getChildCount(Object parent) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if(parent instanceof Branch) {
+            Branch parentBranch = (Branch) parent;
+            return parentBranch.getChildCount();
+        }
+        return 0;
     }
 
     @Override
     public boolean isLeaf(Object node) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if(node instanceof Branch) {
+            Branch nodeBranch = (Branch) node;
+            return nodeBranch.isLeaf();
+        }
+        return false;
     }
 
     @Override
     public void valueForPathChanged(TreePath path, Object newValue) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        Branch object = (Branch)path.getLastPathComponent();
+        object = (Branch)newValue;
     }
 
     @Override
     public int getIndexOfChild(Object parent, Object child) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if(parent instanceof Branch) {
+            Branch parentBranch = (Branch) parent;
+            return parentBranch.getIndex((Branch)child);
+        }
+        return -1;
     }
 
     @Override
     public void addTreeModelListener(TreeModelListener l) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if(!this.listener.contains(l))
+            this.listener.add(l);
     }
 
     @Override
     public void removeTreeModelListener(TreeModelListener l) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if(this.listener.contains(l))
+            this.listener.remove(l);
     }
+    
+    public void fireTreeNodesInserted(TreeModelEvent e) {
+        for(TreeModelListener current : listener) {
+            current.treeNodesInserted(e);
+        }
+    }
+    
+    public void fireTreeNodesRemoved(TreeModelEvent e) {
+        for(TreeModelListener current : listener) {
+            current.treeNodesInserted(e);
+        }
+    }
+    
+    public void fireTreeNodesChanged(TreeModelEvent e) {
+        for(TreeModelListener current : listener) {
+            current.treeNodesInserted(e);
+        }
+    }
+    
+    public void fireTreeStructureChanged(TreeModelEvent e) {
+        for(TreeModelListener current : listener) {
+            current.treeNodesInserted(e);
+        }
+    }
+
     
 }

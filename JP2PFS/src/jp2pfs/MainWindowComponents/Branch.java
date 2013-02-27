@@ -5,6 +5,7 @@
 package jp2pfs.MainWindowComponents;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import javax.swing.tree.TreeNode;
@@ -15,8 +16,19 @@ import javax.swing.tree.TreeNode;
  */
 public class Branch implements TreeNode {
     
-    int index = -1;
-    List<Branch> children = new ArrayList<Branch>();
+    private Branch parent = null;
+    private List<Branch> children = new ArrayList<Branch>();
+    private String name = "";
+    
+    public Branch(String name, Branch parent) {
+        this.name = name;
+        this.parent = parent;
+    }
+    
+    public String toString() {
+        System.out.println("Called");
+        return name;
+    }
     
     public void add(Branch child) {
         children.add(child);
@@ -29,32 +41,36 @@ public class Branch implements TreeNode {
 
     @Override
     public int getChildCount() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return children.size();
     }
 
     @Override
     public TreeNode getParent() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return parent;
     }
 
     @Override
     public int getIndex(TreeNode node) {
-        return this.index;
+        return children.indexOf(node);
     }
 
     @Override
     public boolean getAllowsChildren() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return true;
     }
 
     @Override
     public boolean isLeaf() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return parent != null;
     }
 
     @Override
     public Enumeration children() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return Collections.enumeration(children);
+    }
+    
+    public List<Branch> getChildren() {
+        return this.children;
     }
     
     

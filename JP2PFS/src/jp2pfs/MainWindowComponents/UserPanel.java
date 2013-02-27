@@ -7,7 +7,6 @@ package jp2pfs.MainWindowComponents;
 import java.util.List;
 import jp2pfs.Chat.ChatMessage;
 import jp2pfs.client.PTPClient;
-import sun.reflect.generics.tree.Tree;
 
 /**
  *
@@ -17,6 +16,8 @@ public class UserPanel extends javax.swing.JPanel {
 
     private UserItem to = null;
     private UserItem from = null;
+    
+    private FileTreeModel treeModel = null;
     
     
     public UserItem getTo() {
@@ -38,8 +39,10 @@ public class UserPanel extends javax.swing.JPanel {
         initFileView();
     }
     
-    public void initFileView() {
-        
+    private void initFileView() {
+        treeModel = (FileTreeModel)UserTreeView.getModel();
+        treeModel.addBranch(null, new Branch("Freigegebene Dokumente", null));
+        UserTreeView.updateUI();
     }
     
     public void setMessages(List<ChatMessage> messageList) {
@@ -71,8 +74,7 @@ public class UserPanel extends javax.swing.JPanel {
 
         setPreferredSize(new java.awt.Dimension(527, 350));
 
-        javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("root");
-        UserTreeView.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
+        UserTreeView.setModel(new FileTreeModel());
         jScrollPane1.setViewportView(UserTreeView);
 
         UserChatTextArea.setColumns(20);
