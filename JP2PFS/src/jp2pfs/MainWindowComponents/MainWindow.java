@@ -277,7 +277,10 @@ public class MainWindow extends javax.swing.JFrame {
                     messageList.add(chatMessage);
                     if(user.getTabIndex() != 0) {
                         ((UserPanel)mainWindowTabPane.getComponentAt(user.getTabIndex())).addMessage(chatMessage);
+                    } else {
+                        createTabUser(list.indexOf(user));
                     }
+                    mainWindowTabPane.setSelectedIndex(user.getTabIndex());
                 }
             }
         }
