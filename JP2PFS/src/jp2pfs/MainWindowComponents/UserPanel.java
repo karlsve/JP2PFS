@@ -42,7 +42,7 @@ public class UserPanel extends javax.swing.JPanel {
     }
     
     public void addMessage(ChatMessage message) {
-        UserChatTextArea.append(message.getFrom()+": "+message.getContent()+"\n");
+        UserChatTextArea.append(message.getFrom().getUsername()+": "+message.getContent()+"\n");
     }
 
     /**

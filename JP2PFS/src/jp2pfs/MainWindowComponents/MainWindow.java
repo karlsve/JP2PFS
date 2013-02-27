@@ -4,6 +4,7 @@
  */
 package jp2pfs.MainWindowComponents;
 
+import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.net.InetAddress;
@@ -227,8 +228,12 @@ public class MainWindow extends javax.swing.JFrame {
                         UserItem user = list.getElementAt(i);
                         System.out.println(user);
                         if(message.getTo().equals(user)) {
-                            System.out.println("Message sent.");
-                            user.addMessage(new ChatMessage(message.getFrom(), message.getTo(), message.getMessage()));
+                            ChatMessage chatMessage = new ChatMessage(message.getFrom(), message.getTo(), message.getMessage());
+                            user.addMessage(chatMessage);
+                            if(user.getTabIndex() != 0) {
+                                System.out.println(user.getTabIndex());
+                                ((UserPanel)mainWindowTabPane.getComponentAt(user.getTabIndex())).addMessage(chatMessage);
+                            }
                         }
                     }
                     break;
@@ -241,7 +246,7 @@ public class MainWindow extends javax.swing.JFrame {
                             ChatMessage chatMessage = new ChatMessage(message.getFrom(), message.getTo(), message.getMessage());
                             user.addMessage(chatMessage);
                             if(user.getTabIndex() != 0) {
-                                ((UserPanel)mainWindowTabPane.getTabComponentAt(user.getTabIndex())).addMessage(chatMessage);
+                                ((UserPanel)mainWindowTabPane.getComponentAt(user.getTabIndex())).addMessage(chatMessage);
                             }
                         }
                         System.out.println("test");
