@@ -48,16 +48,14 @@ public class PTPServer implements Runnable {
                 UserItem from = null;
                 UserItem to = null;
                 for(UserItem user : userList) {
-                    if(user.getIp().equals(clientConnection.getLocalAddress())) {
-                        to = user;
-                        System.out.println(user);
+                    if(user.getIp().equals(clientConnection.getInetAddress())) {
+                        from = user;
                         break;
                     }
                 }
                 for(UserItem user : userList) {
-                    if(user.getIp().equals(clientConnection.getInetAddress())) {
-                        from = user;
-                        System.out.println(user);
+                    if(user.getIp().equals(clientConnection.getLocalAddress())) {
+                        to = user;
                         break;
                     }
                 }

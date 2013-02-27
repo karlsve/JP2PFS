@@ -20,10 +20,7 @@ public class JavaPeerToPeerFileSharing {
     }
     
     public JavaPeerToPeerFileSharing() {
-        //initLayout();
         initMainWindow();
-        //startServer();
-        //startClient();
     }
 
     private void initMainWindow() {

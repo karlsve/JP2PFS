@@ -41,9 +41,7 @@ public class PTPClientMessage {
         this.sender = sender;
         this.messageCode = messageCode;
         this.message = message;
-        System.out.println(from);
         this.from = from;
-        System.out.println(to);
         this.to = to;
     }
     public Object getSender() {

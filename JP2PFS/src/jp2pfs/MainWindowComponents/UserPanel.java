@@ -4,6 +4,7 @@
  */
 package jp2pfs.MainWindowComponents;
 
+import java.util.List;
 import jp2pfs.Chat.ChatMessage;
 import jp2pfs.client.PTPClient;
 
@@ -32,12 +33,11 @@ public class UserPanel extends javax.swing.JPanel {
         this.from = from;
         
         initComponents();
-        initChat();
     }
     
-    private void initChat() {
-        for(ChatMessage message : from.getMessages()) {
-            UserChatTextArea.append(from.getUsername()+": "+message.getContent()+"\n");
+    public void setMessages(List<ChatMessage> messageList) {
+        for(ChatMessage chatMessage : messageList) {
+            this.addMessage(chatMessage);
         }
     }
     
