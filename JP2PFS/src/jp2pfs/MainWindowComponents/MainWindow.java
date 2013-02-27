@@ -211,10 +211,12 @@ public class MainWindow extends javax.swing.JFrame {
                 panel.setMessages(this.getSpecificMessageListForUser(item));
                 mainWindowTabPane.addTab(item.getUsername(), panel);
                 item.setTabIndex(mainWindowTabPane.indexOfComponent(panel));
-                mainWindowTabPane.setSelectedIndex(item.getTabIndex());
-            } else {
-                mainWindowTabPane.setSelectedIndex(0);
             }
+        }
+        if(item != self) {
+            mainWindowTabPane.setSelectedIndex(item.getTabIndex());
+        } else {
+            mainWindowTabPane.setSelectedIndex(0);
         }
     }
     
