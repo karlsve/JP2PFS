@@ -161,7 +161,6 @@ public class MainWindow extends javax.swing.JFrame {
             for(InetAddress ip : localip) {
                 if(current.getIp().equals(ip)) {
                     self = current;
-                    System.out.println(ip);
                 }
             }
         }
@@ -226,7 +225,9 @@ public class MainWindow extends javax.swing.JFrame {
                 case MESSAGE_SEND_SUCCESS:
                     for(int i = 0; i<list.getSize(); i++) {
                         UserItem user = list.getElementAt(i);
-                        if(message.getTo().equals(user.getIp())) {
+                        System.out.println(user);
+                        if(message.getTo().equals(user)) {
+                            System.out.println("Message sent.");
                             user.addMessage(new ChatMessage(message.getFrom(), message.getTo(), message.getMessage()));
                         }
                     }
@@ -234,14 +235,16 @@ public class MainWindow extends javax.swing.JFrame {
                 case MESSAGE_RECEIVE_SUCCESS:
                     for(int i = 0; i<list.getSize(); i++) {
                         UserItem user = list.getElementAt(i);
-                        if(message.getFrom().equals(user.getIp())) {
+                        System.out.println(user);
+                        if(message.getFrom().getIp().equals(user.getIp())) {
+                            System.out.println("Message received.");
                             ChatMessage chatMessage = new ChatMessage(message.getFrom(), message.getTo(), message.getMessage());
                             user.addMessage(chatMessage);
                             if(user.getTabIndex() != 0) {
                                 ((UserPanel)mainWindowTabPane.getTabComponentAt(user.getTabIndex())).addMessage(chatMessage);
                             }
-                            break;
                         }
+                        System.out.println("test");
                     }
                     break;
                 default:
