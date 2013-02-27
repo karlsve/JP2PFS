@@ -79,6 +79,7 @@ public class UserPanel extends javax.swing.JPanel {
 
         UserChatTextArea.setColumns(20);
         UserChatTextArea.setRows(5);
+        UserChatTextArea.setEnabled(false);
         jScrollPane2.setViewportView(UserChatTextArea);
 
         UserChatSend.setText("Senden");

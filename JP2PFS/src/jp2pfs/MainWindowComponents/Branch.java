@@ -25,8 +25,8 @@ public class Branch implements TreeNode {
         this.parent = parent;
     }
     
+    @Override
     public String toString() {
-        System.out.println("Called");
         return name;
     }
     

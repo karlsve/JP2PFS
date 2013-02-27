@@ -37,6 +37,8 @@ public class MainWindow extends javax.swing.JFrame {
     
     List<ChatMessage> messageList = new ArrayList<ChatMessage>();
     
+    FileTreeModel treeModel = null;
+    
     PTPServerListener serverListener = new PTPServerListener() {
 
         @Override
@@ -92,6 +94,7 @@ public class MainWindow extends javax.swing.JFrame {
 
         jSplitPane1.setLeftComponent(userListScrollPane);
 
+        MainWindowHomeTreeView.setModel(new FileTreeModel());
         mainWindowHomeScrollPane.setViewportView(MainWindowHomeTreeView);
 
         javax.swing.GroupLayout mainWindowHomePanelLayout = new javax.swing.GroupLayout(mainWindowHomePanel);
@@ -144,6 +147,13 @@ public class MainWindow extends javax.swing.JFrame {
         initUserList();
         startServer();
         initUser();
+        initFileView();
+    }
+    
+    private void initFileView() {
+        treeModel = (FileTreeModel)MainWindowHomeTreeView.getModel();
+        treeModel.addBranch(null, new Branch("Freigegebene Dokumente", null));
+        MainWindowHomeTreeView.updateUI();
     }
     
     private void initTabPane() {
