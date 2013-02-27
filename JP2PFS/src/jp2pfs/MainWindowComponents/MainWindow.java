@@ -17,6 +17,7 @@ import jp2pfs.Chat.ChatMessage;
 import jp2pfs.client.PTPClient;
 import jp2pfs.client.PTPClientListener;
 import jp2pfs.client.PTPClientMessage;
+import jp2pfs.client.PTPClientMessage.PTPClientMessageCode;
 import jp2pfs.global.IPHandling;
 import jp2pfs.server.PTPServer;
 import jp2pfs.server.PTPServerListener;
@@ -33,6 +34,8 @@ public class MainWindow extends javax.swing.JFrame {
     int serverport = 2100;
     
     UserItem self = null;
+    
+    List<ChatMessage> messageList = new ArrayList<ChatMessage>();
     
     PTPServerListener serverListener = new PTPServerListener() {
 
@@ -147,8 +150,15 @@ public class MainWindow extends javax.swing.JFrame {
             public void mouseClicked(final MouseEvent e) {
                 if(SwingUtilities.isRightMouseButton(e)) {
                     int index = mainWindowTabPane.getSelectedIndex();
-                    if(mainWindowTabPane.getTitleAt(index) != "Home") {
-                        mainWindowTabPane.removeTabAt(index);
+                    if(index != 0) {
+                        for(UserItem user : getUserList()) {
+                            if(user.getTabIndex() == index) {
+                                user.setTabIndex(0);
+                                mainWindowTabPane.removeTabAt(index);
+                            } else if(user.getTabIndex() > index) {
+                                user.setTabIndex(user.getTabIndex()-1);
+                            }
+                        }
                     }
                 }
             }
@@ -196,10 +206,11 @@ public class MainWindow extends javax.swing.JFrame {
     private void createTabUser(int userindex) {
         UserItem item = (UserItem)userList.getModel().getElementAt(userindex);
         UserPanel panel = new UserPanel(self, item);
-        if(mainWindowTabPane.indexOfComponent(panel) < 0) {
+        if(item.getTabIndex() == 0) {
+            panel.setMessages(this.getSpecificMessageListForUser(item));
             mainWindowTabPane.addTab(item.getUsername(), panel);
+            item.setTabIndex(mainWindowTabPane.indexOfComponent(panel));
         }
-        item.setTabIndex(mainWindowTabPane.indexOfComponent(panel));
         mainWindowTabPane.setSelectedIndex(item.getTabIndex());
     }
     
@@ -228,35 +239,57 @@ public class MainWindow extends javax.swing.JFrame {
         return returnUserList;
     }
     
-    public void pushMessage(UserItem user, ChatMessage chatMessage) {
-        user.addMessage(chatMessage);
-        if(user.getTabIndex() != 0) {
-            ((UserPanel)mainWindowTabPane.getComponentAt(user.getTabIndex())).addMessage(chatMessage);
+    private List<ChatMessage> getSpecificMessageListForUser(UserItem user) {
+        List<ChatMessage> specificMessageList = new ArrayList<ChatMessage>();
+        for(ChatMessage chatMessage : messageList) {
+            if(chatMessage.getFrom() != null) {
+                if(chatMessage.getFrom().equals(user)) {
+                    specificMessageList.add(chatMessage);
+                }
+            }
+            if(chatMessage.getTo() != null) {
+                if(chatMessage.getTo().equals(user)) {
+                    specificMessageList.add(chatMessage);
+                }
+            }
+        }
+        return specificMessageList;
+    }
+    
+    public void pushMessage(PTPClientMessage message) {
+        List<UserItem> list = this.getUserList();
+        if(message.getMessageCode() == PTPClientMessageCode.MESSAGE_SEND_SUCCESS) {
+            for(UserItem user : list) {
+                if(message.getTo().equals(user)) {
+                    ChatMessage chatMessage = new ChatMessage(message.getFrom(), message.getTo(), message.getMessage());
+                    messageList.add(chatMessage);
+                    if(user.getTabIndex() != 0) {
+                        ((UserPanel)mainWindowTabPane.getComponentAt(user.getTabIndex())).addMessage(chatMessage);
+                    }
+                    break;
+                }
+            }
+        } else {
+            for(UserItem user : list) {
+                if(message.getFrom().equals(user)) {
+                    ChatMessage chatMessage = new ChatMessage(message.getFrom(), message.getTo(), message.getMessage());
+                    messageList.add(chatMessage);
+                    if(user.getTabIndex() != 0) {
+                        ((UserPanel)mainWindowTabPane.getComponentAt(user.getTabIndex())).addMessage(chatMessage);
+                    }
+                }
+            }
         }
     }
     
     private void onClientMessage(PTPClientMessage message) {
         if(message.getSender() instanceof PTPClient) {
-            List<UserItem> list = this.getUserList();
             switch(message.getMessageCode()) {
                 case MESSAGE_SEND_SUCCESS:
-                    for(UserItem user : list) {
-                        if(message.getTo().getUsername().equals(user.getUsername())) {
-                            ChatMessage chatMessage = new ChatMessage(message.getFrom(), message.getTo(), message.getMessage() + " -sent");
-                            pushMessage(user, chatMessage);
-                            break;
-                        }
-                    }
+                    pushMessage(message);
                     break;
                 case MESSAGE_RECEIVE_SUCCESS:
-                    for(UserItem user : list) {
-                        if(message.getFrom().getUsername().equals(user.getUsername())) {
-                            System.out.println(message.getFrom()+": "+message.getMessage());
-                            ChatMessage chatMessage = new ChatMessage(message.getFrom(), message.getTo(), message.getMessage() + " -receive");
-                            pushMessage(user, chatMessage);
-                            break;
-                        }
-                    }
+                    pushMessage(message);
                     break;
                 default:
                     System.out.println(message.getMessage());
