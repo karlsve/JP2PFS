@@ -207,11 +207,15 @@ public class MainWindow extends javax.swing.JFrame {
         UserItem item = (UserItem)userList.getModel().getElementAt(userindex);
         UserPanel panel = new UserPanel(self, item);
         if(item.getTabIndex() == 0) {
-            panel.setMessages(this.getSpecificMessageListForUser(item));
-            mainWindowTabPane.addTab(item.getUsername(), panel);
-            item.setTabIndex(mainWindowTabPane.indexOfComponent(panel));
+            if(item != self) {
+                panel.setMessages(this.getSpecificMessageListForUser(item));
+                mainWindowTabPane.addTab(item.getUsername(), panel);
+                item.setTabIndex(mainWindowTabPane.indexOfComponent(panel));
+                mainWindowTabPane.setSelectedIndex(item.getTabIndex());
+            } else {
+                mainWindowTabPane.setSelectedIndex(0);
+            }
         }
-        mainWindowTabPane.setSelectedIndex(item.getTabIndex());
     }
     
     private void startServer() {
@@ -242,17 +246,10 @@ public class MainWindow extends javax.swing.JFrame {
     private List<ChatMessage> getSpecificMessageListForUser(UserItem user) {
         List<ChatMessage> specificMessageList = new ArrayList<ChatMessage>();
         for(ChatMessage chatMessage : messageList) {
-            if(chatMessage.getFrom() != null) {
-                if(chatMessage.getFrom().equals(user)) {
-                    specificMessageList.add(chatMessage);
-                }
-            }
-            if(chatMessage.getTo() != null) {
-                if(chatMessage.getTo().equals(user)) {
-                    specificMessageList.add(chatMessage);
-                }
-            } else {
-                System.out.println("To null");
+            if(chatMessage.getFrom().equals(user)) {
+                specificMessageList.add(chatMessage);
+            } else if(chatMessage.getTo().equals(user)) {
+                specificMessageList.add(chatMessage);
             }
         }
         return specificMessageList;
