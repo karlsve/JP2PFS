@@ -251,6 +251,8 @@ public class MainWindow extends javax.swing.JFrame {
                 if(chatMessage.getTo().equals(user)) {
                     specificMessageList.add(chatMessage);
                 }
+            } else {
+                System.out.println("To null");
             }
         }
         return specificMessageList;

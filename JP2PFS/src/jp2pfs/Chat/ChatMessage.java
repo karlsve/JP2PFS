@@ -30,6 +30,7 @@ public class ChatMessage {
     
     public ChatMessage(UserItem from, UserItem to, String content) {
         this.from = from;
+        this.to = to;
         this.content = content;
     }
             
