@@ -218,6 +218,13 @@ public class MainWindow extends javax.swing.JFrame {
         }
     }
     
+    public void pushMessageToPane(UserItem user, ChatMessage chatMessage) {
+        user.addMessage(chatMessage);
+        if(user.getTabIndex() != 0) {
+            ((UserPanel)mainWindowTabPane.getComponentAt(user.getTabIndex())).addMessage(chatMessage);
+        }
+    }
+    
     private void onClientMessage(PTPClientMessage message) {
         if(message.getSender() instanceof PTPClient) {
             PTPClient client = (PTPClient) message.getSender();
@@ -228,12 +235,8 @@ public class MainWindow extends javax.swing.JFrame {
                         UserItem user = list.getElementAt(i);
                         System.out.println(user);
                         if(message.getTo().equals(user)) {
-                            ChatMessage chatMessage = new ChatMessage(message.getFrom(), message.getTo(), message.getMessage());
-                            user.addMessage(chatMessage);
-                            if(user.getTabIndex() != 0) {
-                                System.out.println(user.getTabIndex());
-                                ((UserPanel)mainWindowTabPane.getComponentAt(user.getTabIndex())).addMessage(chatMessage);
-                            }
+                            ChatMessage chatMessage = new ChatMessage(message.getFrom(), message.getTo(), message.getMessage() + " -sent");
+                            pushMessageToPane(user, chatMessage);
                         }
                     }
                     break;
@@ -241,9 +244,9 @@ public class MainWindow extends javax.swing.JFrame {
                     for(int i = 0; i<list.getSize(); i++) {
                         UserItem user = list.getElementAt(i);
                         System.out.println(user);
-                        if(message.getFrom().getIp().equals(user.getIp())) {
+                        if(message.getFrom().equals(user)) {
                             System.out.println("Message received.");
-                            ChatMessage chatMessage = new ChatMessage(message.getFrom(), message.getTo(), message.getMessage());
+                            ChatMessage chatMessage = new ChatMessage(message.getFrom(), message.getTo(), message.getMessage() + " -receive");
                             user.addMessage(chatMessage);
                             if(user.getTabIndex() != 0) {
                                 ((UserPanel)mainWindowTabPane.getComponentAt(user.getTabIndex())).addMessage(chatMessage);

@@ -107,7 +107,7 @@ public class UserPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void UserChatSendMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_UserChatSendMouseClicked
-        PTPClient client = new PTPClient(to, from);
+        PTPClient client = new PTPClient(from, to);
         client.addListener(from.getClientListener());
         client.sendMessageClient(UserChatInput.getText());
         UserChatInput.setText("");
