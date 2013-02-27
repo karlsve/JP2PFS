@@ -241,17 +241,20 @@ public class MainWindow extends javax.swing.JFrame {
             switch(message.getMessageCode()) {
                 case MESSAGE_SEND_SUCCESS:
                     for(UserItem user : list) {
-                        if(message.getTo().equals(user)) {
+                        if(message.getTo().getUsername().equals(user.getUsername())) {
                             ChatMessage chatMessage = new ChatMessage(message.getFrom(), message.getTo(), message.getMessage() + " -sent");
                             pushMessage(user, chatMessage);
+                            break;
                         }
                     }
                     break;
                 case MESSAGE_RECEIVE_SUCCESS:
                     for(UserItem user : list) {
-                        if(message.getFrom().getIp().equals(user.getIp())) {
+                        if(message.getFrom().getUsername().equals(user.getUsername())) {
+                            System.out.println(message.getFrom()+": "+message.getMessage());
                             ChatMessage chatMessage = new ChatMessage(message.getFrom(), message.getTo(), message.getMessage() + " -receive");
                             pushMessage(user, chatMessage);
+                            break;
                         }
                     }
                     break;
