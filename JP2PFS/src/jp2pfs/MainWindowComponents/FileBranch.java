@@ -16,10 +16,16 @@ public class FileBranch extends Branch {
         super(name, parent);
     }
     
+    File file = null;
+    
     @Override
     public boolean getAllowsChildren() {
         return false;
     }
     
+    private File getFile(File file)
+    {   
+        return this.file;
+    }
 }
 
