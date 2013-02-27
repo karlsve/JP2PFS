@@ -4,11 +4,11 @@
  */
 package jp2pfs.MainWindowComponents;
 
-import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
@@ -137,8 +137,8 @@ public class MainWindow extends javax.swing.JFrame {
 
     private void init() {
         initTabPane();
-        startServer();
         initUserList();
+        startServer();
         initUser();
     }
     
@@ -205,7 +205,7 @@ public class MainWindow extends javax.swing.JFrame {
     
     private void startServer() {
         if(server == null) {
-            server = new PTPServer(serverport);
+            server = new PTPServer(serverport, this.getUserList());
             server.addServerListener(serverListener);
             server.addClientListener(clientListener);
         }
@@ -218,7 +218,17 @@ public class MainWindow extends javax.swing.JFrame {
         }
     }
     
-    public void pushMessageToPane(UserItem user, ChatMessage chatMessage) {
+    private List<UserItem> getUserList() {
+        DefaultListModel<UserItem> list = (DefaultListModel<UserItem>) userList.getModel();
+        List<UserItem> returnUserList = new ArrayList<UserItem>();
+        for(int i = 0; i<list.getSize(); i++) {
+            UserItem user = list.getElementAt(i);
+            returnUserList.add(user);
+        }
+        return returnUserList;
+    }
+    
+    public void pushMessage(UserItem user, ChatMessage chatMessage) {
         user.addMessage(chatMessage);
         if(user.getTabIndex() != 0) {
             ((UserPanel)mainWindowTabPane.getComponentAt(user.getTabIndex())).addMessage(chatMessage);
@@ -227,32 +237,22 @@ public class MainWindow extends javax.swing.JFrame {
     
     private void onClientMessage(PTPClientMessage message) {
         if(message.getSender() instanceof PTPClient) {
-            PTPClient client = (PTPClient) message.getSender();
-            DefaultListModel<UserItem> list = (DefaultListModel<UserItem>) userList.getModel();
+            List<UserItem> list = this.getUserList();
             switch(message.getMessageCode()) {
                 case MESSAGE_SEND_SUCCESS:
-                    for(int i = 0; i<list.getSize(); i++) {
-                        UserItem user = list.getElementAt(i);
-                        System.out.println(user);
+                    for(UserItem user : list) {
                         if(message.getTo().equals(user)) {
                             ChatMessage chatMessage = new ChatMessage(message.getFrom(), message.getTo(), message.getMessage() + " -sent");
-                            pushMessageToPane(user, chatMessage);
+                            pushMessage(user, chatMessage);
                         }
                     }
                     break;
                 case MESSAGE_RECEIVE_SUCCESS:
-                    for(int i = 0; i<list.getSize(); i++) {
-                        UserItem user = list.getElementAt(i);
-                        System.out.println(user);
-                        if(message.getFrom().equals(user)) {
-                            System.out.println("Message received.");
+                    for(UserItem user : list) {
+                        if(message.getFrom().getIp().equals(user.getIp())) {
                             ChatMessage chatMessage = new ChatMessage(message.getFrom(), message.getTo(), message.getMessage() + " -receive");
-                            user.addMessage(chatMessage);
-                            if(user.getTabIndex() != 0) {
-                                ((UserPanel)mainWindowTabPane.getComponentAt(user.getTabIndex())).addMessage(chatMessage);
-                            }
+                            pushMessage(user, chatMessage);
                         }
-                        System.out.println("test");
                     }
                     break;
                 default:

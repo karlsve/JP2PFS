@@ -78,6 +78,12 @@ public class UserItem {
         this.clientListener = listener;
     }
     
+    public UserItem(String username, InetAddress ip, int port) {
+        this.username = username;
+        this.ip = ip;
+        this.port = port;
+    }
+    
     public String toString() {
         return username;
     }

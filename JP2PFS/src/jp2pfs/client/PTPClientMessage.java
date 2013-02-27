@@ -37,7 +37,7 @@ public class PTPClientMessage {
         this.message = message;
     }
     
-    public PTPClientMessage(Object sender, PTPClientMessageCode messageCode, String message, UserItem to, UserItem from) {
+    public PTPClientMessage(Object sender, PTPClientMessageCode messageCode, String message, UserItem from, UserItem to) {
         this.sender = sender;
         this.messageCode = messageCode;
         this.message = message;

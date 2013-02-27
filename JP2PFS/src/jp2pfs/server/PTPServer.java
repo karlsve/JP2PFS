@@ -8,6 +8,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import jp2pfs.MainWindowComponents.UserItem;
 import jp2pfs.client.PTPClient;
 import jp2pfs.client.PTPClientListener;
 import jp2pfs.server.PTPServerMessage.PTPServerMessageCode;
@@ -26,9 +27,11 @@ public class PTPServer implements Runnable {
     
     List<PTPServerListener> serverListener = new ArrayList<PTPServerListener>();
     List<PTPClientListener> clientListener = new ArrayList<PTPClientListener>();
+    List<UserItem> userList = new ArrayList<UserItem>();
     
-    public PTPServer(int port) {
+    public PTPServer(int port, List<UserItem> userList) {
         this.port = port;
+        this.userList = userList;
     }
     
     private void init() {
@@ -42,7 +45,21 @@ public class PTPServer implements Runnable {
         while(run) {
             try {
                 Socket clientConnection = this.connection.accept();
-                PTPClient client = new PTPClient(clientConnection);
+                UserItem from = null;
+                UserItem to = null;
+                for(UserItem user : userList) {
+                    if(user.getIp().equals(clientConnection.getLocalAddress())) {
+                        from = user;
+                        break;
+                    }
+                }
+                for(UserItem user : userList) {
+                    if(user.getIp().equals(clientConnection.getInetAddress())) {
+                        to = user;
+                        break;
+                    }
+                }
+                PTPClient client = new PTPClient(clientConnection, from, to);
                 client.addListenerSet(clientListener);
                 client.receiveMessageClient();
                 this.sendMessage(this, PTPServerMessageCode.SUCCESS, "Connection to client established.");

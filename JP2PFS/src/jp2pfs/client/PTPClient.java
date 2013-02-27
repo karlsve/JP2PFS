@@ -34,8 +34,10 @@ public class PTPClient {
         this.to = to;
     }
     
-    public PTPClient(Socket connection) {
+    public PTPClient(Socket connection, UserItem from, UserItem to) {
         clientSocket = connection;
+        this.from = from;
+        this.to = to;
     }
     
     private void connect()
@@ -56,8 +58,8 @@ public class PTPClient {
                 BufferedReader inputStream = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 String message = inputStream.readLine();
                 this.sendMessage(this, PTPClientMessageCode.MESSAGE_RECEIVE_SUCCESS, message);
-            } catch (IOException ex) {
-                this.sendDebugMessage(this, PTPClientMessageCode.MESSAGE_RECEIVE_ERROR, "Could not send the message.");
+            } catch (Exception ex) {
+                this.sendDebugMessage(this, PTPClientMessageCode.MESSAGE_RECEIVE_ERROR, "Could not receive the message.");
             }
         }
     }
@@ -111,7 +113,7 @@ public class PTPClient {
     }
 
     private void sendMessage(Object sender, PTPClientMessageCode code, String content) {
-        PTPClientMessage message = new PTPClientMessage(sender, code, content, to, from);
+        PTPClientMessage message = new PTPClientMessage(sender, code, content, from, to);
         for(PTPClientListener listener : clientListener) {
             if(listener != null)
                 listener.onMessage(message);
