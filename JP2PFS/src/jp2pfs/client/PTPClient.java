@@ -4,9 +4,7 @@
  */
 package jp2pfs.client;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +21,7 @@ public class PTPClient {
     private UserItem from = null;
     private UserItem to = null;
     private Socket clientSocket = null;
+    private String downloadPath = "C:\\Documents and Settings\\All Users\\Downloads\\";
     List<PTPClientListener> clientListener = new ArrayList<PTPClientListener>();
     
     
@@ -59,6 +58,9 @@ public class PTPClient {
                     case 1:
                         receiveTextMessageClient(inputStream);
                         break;
+                    case 2:
+                        receiveFileMessageClient(inputStream);
+                        break;
                 }
             } catch (Exception ex) {
                 this.sendDebugMessage(this, PTPClientMessageCode.MESSAGE_RECEIVE_ERROR, "Could not receive the message.");
@@ -71,9 +73,54 @@ public class PTPClient {
         message = inputStream.readUTF();
         this.sendMessage(this, PTPClientMessageCode.MESSAGE_RECEIVE_SUCCESS, message);
     }
+
+    private void receiveFileMessageClient(DataInputStream inputStream) throws IOException {
+        int bufferSize = 150000;
+        int bytesRead = 0;
+        int counter = 0;
+        
+        FileOutputStream outputStream = new FileOutputStream(downloadPath+inputStream.readUTF());
+
+        byte[] buffer = new byte[bufferSize];
+
+        while((bytesRead = inputStream.read(buffer)) != -1) {
+            if(bytesRead >= 0) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+        }
+
+        outputStream.close();
+            
+        this.sendMessage(this, PTPClientMessageCode.FILE_RECEIVE_SUCCESS, "File received.");
+    }
+    
+    public void sendFileMessageClient(File file) {
+        if(clientSocket == null) {
+            this.connect();
+        }
+        try {
+            DataOutputStream outputStream = new DataOutputStream(clientSocket.getOutputStream());
+            outputStream.writeByte(2);
+            int bufferSize = 150000;
+            outputStream.flush();
+        
+            FileInputStream fileStream = new FileInputStream(file);
+            
+            byte[] buffer = new byte[bufferSize];
+            for(int i = 0; i<file.length(); i+=bufferSize) {
+                fileStream.read(buffer);
+                outputStream.writeUTF(file.getName());
+                outputStream.write(buffer);
+            }
+            fileStream.close();
+            outputStream.flush();
+            this.sendMessage(this, PTPClientMessageCode.FILE_SEND_SUCCESS, "File sent.");
+        } catch (Exception ex) {
+            this.sendDebugMessage(this, PTPClientMessageCode.FILE_SEND_ERROR, "Could not send the message.");
+        }
+    }
     
     public void sendTextMessageClient(String message) {
-        
         if(clientSocket == null) {
             this.connect();
         }
@@ -81,6 +128,7 @@ public class PTPClient {
             DataOutputStream outputStream = new DataOutputStream(clientSocket.getOutputStream());
             outputStream.writeByte(1);
             outputStream.writeUTF(message);
+            outputStream.flush();
             this.sendMessage(this, PTPClientMessageCode.MESSAGE_SEND_SUCCESS, message);
         } catch (Exception ex) {
             this.sendDebugMessage(this, PTPClientMessageCode.MESSAGE_SEND_ERROR, "Could not send the message.");
