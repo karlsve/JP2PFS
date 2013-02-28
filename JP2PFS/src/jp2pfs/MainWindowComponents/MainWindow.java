@@ -4,16 +4,13 @@
  */
 package jp2pfs.MainWindowComponents;
 
-import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.beans.PropertyChangeListener;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
-import javax.swing.tree.TreePath;
 import jp2pfs.Chat.ChatMessage;
 import jp2pfs.client.PTPClient;
 import jp2pfs.client.PTPClientListener;
@@ -29,7 +26,6 @@ import jp2pfs.server.PTPServerMessage;
  * @author karlinsv
  */
 public class MainWindow extends javax.swing.JFrame {
-
     
     private PTPServer server = null;
     int serverport = 2100;
@@ -79,8 +75,8 @@ public class MainWindow extends javax.swing.JFrame {
         userList = new javax.swing.JList();
         mainWindowTabPane = new javax.swing.JTabbedPane();
         mainWindowHomePanel = new javax.swing.JPanel();
-        mainWindowHomeScrollPane = new javax.swing.JScrollPane();
-        MainWindowHomeTreeView = new javax.swing.JTree();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        fileTree = new FileTree();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setName("MainWindow");
@@ -95,24 +91,18 @@ public class MainWindow extends javax.swing.JFrame {
 
         jSplitPane1.setLeftComponent(userListScrollPane);
 
-        MainWindowHomeTreeView.setModel(new FileTreeModel());
-        mainWindowHomeScrollPane.setViewportView(MainWindowHomeTreeView);
+        fileTree.setModel(new FileTreeModel());
+        jScrollPane1.setViewportView(fileTree);
 
         javax.swing.GroupLayout mainWindowHomePanelLayout = new javax.swing.GroupLayout(mainWindowHomePanel);
         mainWindowHomePanel.setLayout(mainWindowHomePanelLayout);
         mainWindowHomePanelLayout.setHorizontalGroup(
             mainWindowHomePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(mainWindowHomePanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(mainWindowHomeScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 463, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 483, Short.MAX_VALUE)
         );
         mainWindowHomePanelLayout.setVerticalGroup(
             mainWindowHomePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(mainWindowHomePanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(mainWindowHomeScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 403, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 425, Short.MAX_VALUE)
         );
 
         mainWindowTabPane.addTab("Home", mainWindowHomePanel);
@@ -134,10 +124,10 @@ public class MainWindow extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTree MainWindowHomeTreeView;
+    private javax.swing.JTree fileTree;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JPanel mainWindowHomePanel;
-    private javax.swing.JScrollPane mainWindowHomeScrollPane;
     private javax.swing.JTabbedPane mainWindowTabPane;
     private javax.swing.JList userList;
     private javax.swing.JScrollPane userListScrollPane;
@@ -148,28 +138,7 @@ public class MainWindow extends javax.swing.JFrame {
         initUserList();
         startServer();
         initUser();
-        initFileView();
-    }
-    
-    private void initFileView() {
-        treeModel = (FileTreeModel)MainWindowHomeTreeView.getModel();
-        treeModel.addBranch(null, new Branch("Freigegebene Dokumente", null));
-        MainWindowHomeTreeView.updateUI();
-        MainWindowHomeTreeView.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(final MouseEvent e) {
-                if(SwingUtilities.isRightMouseButton(e)) {
-                    TreePath path = MainWindowHomeTreeView.getSelectionPath();
-                    treePopupMenu(path, e.getX(), e.getY());
-                }
-            }
-        });
-    }
-    
-    private void treePopupMenu(TreePath path, int x, int y) {
-        JPopupMenu menu = new JPopupMenu();
-        menu.add(new JMenuItem("Element hinzufügen"));
-        menu.add(new JMenuItem("Löschen"));
-        menu.show(MainWindowHomeTreeView, x, y);
+        ((FileTree)fileTree).init();
     }
     
     private void initTabPane() {

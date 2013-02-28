@@ -14,14 +14,19 @@ public class DirectoryBranch extends Branch {
 
     File directory = null;
     
-    public DirectoryBranch(File directory, String name, Branch parent) {
-        super(name, parent);
+    public DirectoryBranch(File directory, Branch parent) {
+        super(directory.getName(), parent);
         this.directory = directory;
     }
     
-    public File getdirectory()
+    public File getDirectory()
     {
         return directory;
+    }
+
+    @Override
+    public boolean isLeaf() {
+        return false;
     }
   
 }

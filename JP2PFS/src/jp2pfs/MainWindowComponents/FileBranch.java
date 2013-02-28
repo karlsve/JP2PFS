@@ -11,20 +11,20 @@ import java.io.File;
  * @author Foertsan
  */
 public class FileBranch extends Branch {
-   
-    public FileBranch(File file, String name, Branch parent) {
-        super(name, parent);
-    }
     
     File file = null;
+   
+    public FileBranch(File file, Branch parent) {
+        super(file.getName(), parent);
+        this.file = file;
+    }
     
     @Override
     public boolean getAllowsChildren() {
         return false;
     }
     
-    private File getFile(File file)
-    {   
+    public File getFile(File file) {
         return this.file;
     }
 }

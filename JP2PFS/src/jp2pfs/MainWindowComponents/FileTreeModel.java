@@ -5,8 +5,6 @@
 package jp2pfs.MainWindowComponents;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
 import java.util.List;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
@@ -89,30 +87,5 @@ public class FileTreeModel implements TreeModel {
         if(this.listener.contains(l))
             this.listener.remove(l);
     }
-    
-    public void fireTreeNodesInserted(TreeModelEvent e) {
-        for(TreeModelListener current : listener) {
-            current.treeNodesInserted(e);
-        }
-    }
-    
-    public void fireTreeNodesRemoved(TreeModelEvent e) {
-        for(TreeModelListener current : listener) {
-            current.treeNodesInserted(e);
-        }
-    }
-    
-    public void fireTreeNodesChanged(TreeModelEvent e) {
-        for(TreeModelListener current : listener) {
-            current.treeNodesInserted(e);
-        }
-    }
-    
-    public void fireTreeStructureChanged(TreeModelEvent e) {
-        for(TreeModelListener current : listener) {
-            current.treeNodesInserted(e);
-        }
-    }
-
     
 }
