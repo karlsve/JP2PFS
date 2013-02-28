@@ -77,7 +77,6 @@ public class PTPClient {
     private void receiveFileMessageClient(DataInputStream inputStream) throws IOException {
         int bufferSize = 150000;
         int bytesRead = 0;
-        int counter = 0;
         
         FileOutputStream outputStream = new FileOutputStream(downloadPath+inputStream.readUTF());
 
