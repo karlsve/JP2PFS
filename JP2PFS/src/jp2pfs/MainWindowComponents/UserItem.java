@@ -8,9 +8,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 import jp2pfs.Chat.ChatMessage;
-import jp2pfs.client.PTPClient;
 import jp2pfs.client.PTPClientListener;
-import jp2pfs.client.PTPClientMessage;
 
 /**
  *
@@ -23,6 +21,8 @@ public class UserItem {
     private InetAddress ip = null;
     private int port = 0;
     private int tabIndex = 0;
+    
+    FileTreeModel treeModel = null;
     
     private List<ChatMessage> messages = new ArrayList<ChatMessage>();
     
@@ -62,6 +62,14 @@ public class UserItem {
 
     public String getUsername() {
         return username;
+    }
+
+    public FileTreeModel getTreeModel() {
+        return treeModel;
+    }
+
+    public void setTreeModel(FileTreeModel treeModel) {
+        this.treeModel = treeModel;
     }
     
     public UserItem(String username, String password, InetAddress ip, int port) {

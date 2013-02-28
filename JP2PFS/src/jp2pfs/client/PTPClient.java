@@ -63,6 +63,8 @@ public class PTPClient {
                         break;
                     case 3:
                         receiveFileMessageRequestClient(inputStream);
+                    case 4:
+                        receiveFileListMessageClient(inputStream);
                 }
             } catch (Exception ex) {
                 this.sendDebugMessage(this, PTPClientMessageCode.MESSAGE_RECEIVE_ERROR, "Could not receive the message.");
@@ -91,6 +93,12 @@ public class PTPClient {
         outputStream.close();
             
         this.sendMessage(this, PTPClientMessageCode.FILE_RECEIVE_SUCCESS, "File received.");
+    }
+    
+    private void receiveFileListMessageClient(ObjectInputStream inputStream) throws Exception {
+        File file = (File)inputStream.readObject();
+        PTPClient client = new PTPClient(to, from);
+        client.sendFileMessageClient(file);
     }
     
     private void receiveFileMessageRequestClient(ObjectInputStream inputStream) throws Exception {
