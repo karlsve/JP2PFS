@@ -4,15 +4,16 @@
  */
 package jp2pfs.MainWindowComponents;
 
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeListener;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.DefaultListModel;
-import javax.swing.JList;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
+import javax.swing.tree.TreePath;
 import jp2pfs.Chat.ChatMessage;
 import jp2pfs.client.PTPClient;
 import jp2pfs.client.PTPClientListener;
@@ -154,6 +155,21 @@ public class MainWindow extends javax.swing.JFrame {
         treeModel = (FileTreeModel)MainWindowHomeTreeView.getModel();
         treeModel.addBranch(null, new Branch("Freigegebene Dokumente", null));
         MainWindowHomeTreeView.updateUI();
+        MainWindowHomeTreeView.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(final MouseEvent e) {
+                if(SwingUtilities.isRightMouseButton(e)) {
+                    TreePath path = MainWindowHomeTreeView.getSelectionPath();
+                    treePopupMenu(path, e.getX(), e.getY());
+                }
+            }
+        });
+    }
+    
+    private void treePopupMenu(TreePath path, int x, int y) {
+        JPopupMenu menu = new JPopupMenu();
+        menu.add(new JMenuItem("Element hinzufügen"));
+        menu.add(new JMenuItem("Löschen"));
+        menu.show(MainWindowHomeTreeView, x, y);
     }
     
     private void initTabPane() {
