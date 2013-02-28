@@ -78,8 +78,8 @@ public class UserPanel extends javax.swing.JPanel {
         jScrollPane1.setViewportView(UserTreeView);
 
         UserChatTextArea.setColumns(20);
+        UserChatTextArea.setEditable(false);
         UserChatTextArea.setRows(5);
-        UserChatTextArea.setEnabled(false);
         jScrollPane2.setViewportView(UserChatTextArea);
 
         UserChatSend.setText("Senden");
@@ -116,7 +116,7 @@ public class UserPanel extends javax.swing.JPanel {
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(UserChatInput, javax.swing.GroupLayout.DEFAULT_SIZE, 23, Short.MAX_VALUE)
+                    .addComponent(UserChatInput)
                     .addComponent(UserChatSend, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
