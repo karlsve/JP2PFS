@@ -72,8 +72,7 @@ public class FileHandling {
             
             byte[] buffer = new byte[bufferSize];
             
-            for(int i = 0; i<0;) {
-                bytesRead = inputStream.read(buffer);
+            while((bytesRead = inputStream.read(buffer)) != -1) {
                 
                 if(bytesRead >= 0) {
                     outputStream.write(buffer, 0, bytesRead);

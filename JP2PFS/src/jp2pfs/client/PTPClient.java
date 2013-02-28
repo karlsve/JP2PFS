@@ -4,11 +4,9 @@
  */
 package jp2pfs.client;
 
-import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,23 +53,34 @@ public class PTPClient {
     public void receiveMessageClient() {
         if(clientSocket != null) {
             try {
-                BufferedReader inputStream = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                String message = inputStream.readLine();
-                this.sendMessage(this, PTPClientMessageCode.MESSAGE_RECEIVE_SUCCESS, message);
+                DataInputStream inputStream = new DataInputStream(clientSocket.getInputStream());
+                byte type = inputStream.readByte();
+                switch(type) {
+                    case 1:
+                        receiveTextMessageClient(inputStream);
+                        break;
+                }
             } catch (Exception ex) {
                 this.sendDebugMessage(this, PTPClientMessageCode.MESSAGE_RECEIVE_ERROR, "Could not receive the message.");
             }
         }
     }
+
+    private void receiveTextMessageClient(DataInputStream inputStream) throws IOException {
+        String message = "";
+        message = inputStream.readUTF();
+        this.sendMessage(this, PTPClientMessageCode.MESSAGE_RECEIVE_SUCCESS, message);
+    }
     
-    public void sendMessageClient(String message) {
+    public void sendTextMessageClient(String message) {
         
         if(clientSocket == null) {
             this.connect();
         }
         try {
-            PrintStream outputStream = new PrintStream(clientSocket.getOutputStream());
-            outputStream.println(message);
+            DataOutputStream outputStream = new DataOutputStream(clientSocket.getOutputStream());
+            outputStream.writeByte(1);
+            outputStream.writeUTF(message);
             this.sendMessage(this, PTPClientMessageCode.MESSAGE_SEND_SUCCESS, message);
         } catch (Exception ex) {
             this.sendDebugMessage(this, PTPClientMessageCode.MESSAGE_SEND_ERROR, "Could not send the message.");
