@@ -70,6 +70,9 @@
               <Connection code="new FileTreeModel()" type="code"/>
             </Property>
           </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new FileTree()"/>
+          </AuxValues>
         </Component>
       </SubComponents>
     </Container>

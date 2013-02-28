@@ -52,7 +52,7 @@ public class PTPClient {
     public void receiveMessageClient() {
         if(clientSocket != null) {
             try {
-                DataInputStream inputStream = new DataInputStream(clientSocket.getInputStream());
+                ObjectInputStream inputStream = new ObjectInputStream(clientSocket.getInputStream());
                 byte type = inputStream.readByte();
                 switch(type) {
                     case 1:
@@ -61,6 +61,8 @@ public class PTPClient {
                     case 2:
                         receiveFileMessageClient(inputStream);
                         break;
+                    case 3:
+                        receiveFileMessageRequestClient(inputStream);
                 }
             } catch (Exception ex) {
                 this.sendDebugMessage(this, PTPClientMessageCode.MESSAGE_RECEIVE_ERROR, "Could not receive the message.");
@@ -68,13 +70,13 @@ public class PTPClient {
         }
     }
 
-    private void receiveTextMessageClient(DataInputStream inputStream) throws IOException {
+    private void receiveTextMessageClient(ObjectInputStream inputStream) throws IOException {
         String message = "";
         message = inputStream.readUTF();
         this.sendMessage(this, PTPClientMessageCode.MESSAGE_RECEIVE_SUCCESS, message);
     }
 
-    private void receiveFileMessageClient(DataInputStream inputStream) throws IOException {
+    private void receiveFileMessageClient(ObjectInputStream inputStream) throws IOException {
         int bufferSize = 150000;
         int bytesRead = 0;
         
@@ -82,10 +84,8 @@ public class PTPClient {
 
         byte[] buffer = new byte[bufferSize];
 
-        while((bytesRead = inputStream.read(buffer)) != -1) {
-            if(bytesRead >= 0) {
-                outputStream.write(buffer, 0, bytesRead);
-            }
+        while((bytesRead = inputStream.read(buffer)) >= 0) {
+            outputStream.write(buffer, 0, bytesRead);
         }
 
         outputStream.close();
@@ -93,25 +93,45 @@ public class PTPClient {
         this.sendMessage(this, PTPClientMessageCode.FILE_RECEIVE_SUCCESS, "File received.");
     }
     
+    private void receiveFileMessageRequestClient(ObjectInputStream inputStream) throws Exception {
+        File file = (File)inputStream.readObject();
+        PTPClient client = new PTPClient(to, from);
+        client.sendFileMessageClient(file);
+    }
+    
     public void sendFileMessageClient(File file) {
         if(clientSocket == null) {
             this.connect();
         }
         try {
-            DataOutputStream outputStream = new DataOutputStream(clientSocket.getOutputStream());
+            ObjectOutputStream outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
             outputStream.writeByte(2);
+            outputStream.writeUTF(file.getName());
             int bufferSize = 150000;
-            outputStream.flush();
         
             FileInputStream fileStream = new FileInputStream(file);
             
             byte[] buffer = new byte[bufferSize];
             for(int i = 0; i<file.length(); i+=bufferSize) {
                 fileStream.read(buffer);
-                outputStream.writeUTF(file.getName());
                 outputStream.write(buffer);
             }
             fileStream.close();
+            outputStream.flush();
+            this.sendMessage(this, PTPClientMessageCode.FILE_SEND_SUCCESS, "File sent.");
+        } catch (Exception ex) {
+            this.sendDebugMessage(this, PTPClientMessageCode.FILE_SEND_ERROR, "Could not send the message.");
+        }
+    }
+    
+    public void requestFileMessageClient(File file) {
+        if(clientSocket == null) {
+            this.connect();
+        }
+        try {
+            ObjectOutputStream outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
+            outputStream.writeByte(3);
+            outputStream.writeObject(file);
             outputStream.flush();
             this.sendMessage(this, PTPClientMessageCode.FILE_SEND_SUCCESS, "File sent.");
         } catch (Exception ex) {
@@ -124,7 +144,7 @@ public class PTPClient {
             this.connect();
         }
         try {
-            DataOutputStream outputStream = new DataOutputStream(clientSocket.getOutputStream());
+            ObjectOutputStream outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
             outputStream.writeByte(1);
             outputStream.writeUTF(message);
             outputStream.flush();

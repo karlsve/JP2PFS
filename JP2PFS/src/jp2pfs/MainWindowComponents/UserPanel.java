@@ -36,13 +36,7 @@ public class UserPanel extends javax.swing.JPanel {
         this.from = from;
         
         initComponents();
-        initFileView();
-    }
-    
-    private void initFileView() {
-        treeModel = (FileTreeModel)UserTreeView.getModel();
-        treeModel.addBranch(null, new Branch("Freigegebene Dokumente", null));
-        UserTreeView.updateUI();
+        ((FileTree) UserTreeView).initUser(from, to);
     }
     
     public void setMessages(List<ChatMessage> messageList) {
@@ -65,7 +59,7 @@ public class UserPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        UserTreeView = new javax.swing.JTree();
+        UserTreeView = new FileTree();
         jScrollPane2 = new javax.swing.JScrollPane();
         UserChatTextArea = new javax.swing.JTextArea();
         UserChatInput = new javax.swing.JTextField();

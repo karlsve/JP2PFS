@@ -138,7 +138,7 @@ public class MainWindow extends javax.swing.JFrame {
         initUserList();
         startServer();
         initUser();
-        ((FileTree)fileTree).init();
+        ((FileTree)fileTree).initHome();
     }
     
     private void initTabPane() {

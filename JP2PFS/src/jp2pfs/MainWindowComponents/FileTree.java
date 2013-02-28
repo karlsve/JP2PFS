@@ -10,6 +10,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import javax.swing.*;
+import jp2pfs.client.PTPClient;
 
 /**
  *
@@ -17,16 +18,34 @@ import javax.swing.*;
  */
 public class FileTree extends JTree {
     
-    private ActionListener treeActionListener = new ActionListener() {
+    UserItem to = null;
+    UserItem from = null;
+    
+    private ActionListener treeUserActionListener = new ActionListener() {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if(e.getActionCommand() == "Datei hinzufügen") {
-                addFileElement();
-            } else if(e.getActionCommand() == "Verzeichnis hinzufügen") {
-                addDirectoryElement();
-            } else if(e.getActionCommand() == "Löschen") {
-                deleteElement();
+            if("Datei herunterladen".equals(e.getActionCommand())) {
+                getFile();
+            }
+        }
+        
+    };
+    
+    private ActionListener treeHomeActionListener = new ActionListener() {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            switch (e.getActionCommand()) {
+                case "Datei hinzufügen":
+                    addFileElement();
+                    break;
+                case "Verzeichnis hinzufügen":
+                    addDirectoryElement();
+                    break;
+                case "Löschen":
+                    deleteElement();
+                    break;
             }
         }
         
@@ -36,29 +55,52 @@ public class FileTree extends JTree {
         super();
     }
     
-    public void init() {
+    public void initHome() {
         FileTreeModel fileTreeModel = (FileTreeModel) this.getModel();
         fileTreeModel.addBranch(null, new Branch("Freigegebene Dokumente", null));
         this.addMouseListener(new MouseAdapter() {
             public void mouseClicked(final MouseEvent e) {
                 if(SwingUtilities.isRightMouseButton(e)) {
-                    callPopupMenu(e.getX(), e.getY());
+                    callHomePopupMenu(e.getX(), e.getY());
                 }
             }
         });
         this.updateUI();
     }
     
-    private void callPopupMenu(int x, int y) {
+    public void initUser(UserItem from, UserItem to) {
+        this.from = from;
+        this.to = to;
+        FileTreeModel fileTreeModel = (FileTreeModel) this.getModel();
+        fileTreeModel.addBranch(null, new Branch("Freigegebene Dokumente", null));
+        this.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(final MouseEvent e) {
+                if(SwingUtilities.isRightMouseButton(e)) {
+                    callUserPopupMenu(e.getX(), e.getY());
+                }
+            }
+        });
+        this.updateUI();
+    }
+    
+    private void callHomePopupMenu(int x, int y) {
         JPopupMenu menu = new JPopupMenu();
         JMenuItem menuItem = new JMenuItem("Datei hinzufügen");
-        menuItem.addActionListener(getTreeActionListener());
+        menuItem.addActionListener(treeHomeActionListener);
         menu.add(menuItem);
         menuItem = new JMenuItem("Verzeichnis hinzufügen");
-        menuItem.addActionListener(getTreeActionListener());
+        menuItem.addActionListener(treeHomeActionListener);
         menu.add(menuItem);
         menuItem = new JMenuItem("Löschen");
-        menuItem.addActionListener(getTreeActionListener());
+        menuItem.addActionListener(treeHomeActionListener);
+        menu.add(menuItem);
+        menu.show(this, x, y);
+    }
+    
+    private void callUserPopupMenu(int x, int y) {
+        JPopupMenu menu = new JPopupMenu();
+        JMenuItem menuItem = new JMenuItem("Datei herunterladen");
+        menuItem.addActionListener(treeUserActionListener);
         menu.add(menuItem);
         menu.show(this, x, y);
     }
@@ -92,21 +134,23 @@ public class FileTree extends JTree {
     }
     
     private void deleteElement() {
-        
+        if(this.getSelectionPath() != null) {
+            FileTreeModel fileTreeModel = (FileTreeModel) this.getModel();
+            Branch element = (Branch) this.getSelectionPath().getLastPathComponent();
+            if(!element.equals(fileTreeModel.getRoot())) {
+                ((Branch)element.getParent()).removeChild(element);
+                this.updateUI();
+            }
+        }
     }
 
-    /**
-     * @return the treeActionListener
-     */
-    private ActionListener getTreeActionListener() {
-        return treeActionListener;
-    }
-
-    /**
-     * @param treeActionListener the treeActionListener to set
-     */
-    private void setTreeActionListener(ActionListener treeActionListener) {
-        this.treeActionListener = treeActionListener;
+    private void getFile() {
+        if(this.getSelectionPath() != null) {
+            FileBranch element = (FileBranch)this.getSelectionPath().getLastPathComponent();
+            
+            PTPClient client = new PTPClient(from, to);
+            client.requestFileMessageClient(element.getFile());
+        }
     }
     
 }

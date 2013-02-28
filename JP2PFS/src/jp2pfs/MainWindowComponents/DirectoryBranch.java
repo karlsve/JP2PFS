@@ -12,7 +12,7 @@ import java.io.File;
  */
 public class DirectoryBranch extends Branch {
 
-    File directory = null;
+    private File directory = null;
     
     public DirectoryBranch(File directory, Branch parent) {
         super(directory.getName(), parent);

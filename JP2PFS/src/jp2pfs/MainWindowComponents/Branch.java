@@ -69,6 +69,10 @@ public class Branch implements TreeNode {
         return Collections.enumeration(children);
     }
     
+    public void removeChild(Branch child) {
+        this.children.remove(child);
+    }
+    
     public List<Branch> getChildren() {
         return this.children;
     }

@@ -12,7 +12,7 @@ import java.io.File;
  */
 public class FileBranch extends Branch {
     
-    File file = null;
+    private File file = null;
    
     public FileBranch(File file, Branch parent) {
         super(file.getName(), parent);
@@ -24,7 +24,7 @@ public class FileBranch extends Branch {
         return false;
     }
     
-    public File getFile(File file) {
+    public File getFile() {
         return this.file;
     }
 }
