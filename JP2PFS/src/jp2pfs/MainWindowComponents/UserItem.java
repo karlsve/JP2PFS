@@ -8,6 +8,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 import jp2pfs.Chat.ChatMessage;
+import jp2pfs.client.PTPClient;
 import jp2pfs.client.PTPClientListener;
 
 /**

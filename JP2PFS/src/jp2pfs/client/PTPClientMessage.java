@@ -14,12 +14,12 @@ import jp2pfs.MainWindowComponents.UserItem;
 public class PTPClientMessage {
     
     public enum PTPClientMessageCode {
-        CONNECTION_SUCCESS, CONNECTION_ERROR, CLOSE_ERROR, MESSAGE_RECEIVE_ERROR, MESSAGE_RECEIVE_SUCCESS, MESSAGE_SEND_ERROR, MESSAGE_SEND_SUCCESS, FILE_SEND_SUCCESS, FILE_SEND_ERROR, FILE_RECEIVE_SUCCESS
+        CONNECTION_SUCCESS, CONNECTION_ERROR, CLOSE_ERROR, MESSAGE_RECEIVE_ERROR, MESSAGE_RECEIVE_SUCCESS, MESSAGE_SEND_ERROR, MESSAGE_SEND_SUCCESS, FILE_LIST_SEND_SUCCESS, FILE_LIST_SEND_ERROR, FILE_LIST_RECEIVE_SUCCESS, FILE_LIST_RECEIVE_ERROR, FILE_LIST_REQUEST, FILE_SEND_SUCCESS, FILE_SEND_ERROR, FILE_RECEIVE_SUCCESS
     }
     
     private Object sender = null;
     private PTPClientMessageCode messageCode;
-    private String message = "No message.";
+    private Object message = "No message.";
     private UserItem from = null;
     private UserItem to = null;
 
@@ -31,13 +31,13 @@ public class PTPClientMessage {
         return to;
     }
 
-    public PTPClientMessage(Object sender, PTPClientMessageCode messageCode, String message) {
+    public PTPClientMessage(Object sender, PTPClientMessageCode messageCode, Object message) {
         this.sender = sender;
         this.messageCode = messageCode;
         this.message = message;
     }
     
-    public PTPClientMessage(Object sender, PTPClientMessageCode messageCode, String message, UserItem from, UserItem to) {
+    public PTPClientMessage(Object sender, PTPClientMessageCode messageCode, Object message, UserItem from, UserItem to) {
         this.sender = sender;
         this.messageCode = messageCode;
         this.message = message;
@@ -52,7 +52,7 @@ public class PTPClientMessage {
         return messageCode;
     }
     
-    public String getMessage() {
+    public Object getMessage() {
         return message;
     }
 }

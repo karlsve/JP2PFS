@@ -255,10 +255,10 @@ public class MainWindow extends javax.swing.JFrame {
     
     public void pushMessage(PTPClientMessage message) {
         List<UserItem> list = this.getUserList();
-        if(message.getMessageCode() == PTPClientMessageCode.MESSAGE_SEND_SUCCESS) {
+        if(message.getMessageCode().equals(PTPClientMessageCode.MESSAGE_SEND_SUCCESS)) {
             for(UserItem user : list) {
                 if(message.getTo().equals(user)) {
-                    ChatMessage chatMessage = new ChatMessage(message.getFrom(), message.getTo(), message.getMessage());
+                    ChatMessage chatMessage = new ChatMessage(message.getFrom(), message.getTo(), (String)message.getMessage());
                     messageList.add(chatMessage);
                     if(user.getTabIndex() != 0) {
                         ((UserPanel)mainWindowTabPane.getComponentAt(user.getTabIndex())).addMessage(chatMessage);
@@ -266,10 +266,10 @@ public class MainWindow extends javax.swing.JFrame {
                     break;
                 }
             }
-        } else {
+        } else if(message.getMessageCode().equals(PTPClientMessageCode.MESSAGE_RECEIVE_SUCCESS)) {
             for(UserItem user : list) {
                 if(message.getFrom().equals(user)) {
-                    ChatMessage chatMessage = new ChatMessage(message.getFrom(), message.getTo(), message.getMessage());
+                    ChatMessage chatMessage = new ChatMessage(message.getFrom(), message.getTo(), (String)message.getMessage());
                     messageList.add(chatMessage);
                     if(user.getTabIndex() != 0) {
                         ((UserPanel)mainWindowTabPane.getComponentAt(user.getTabIndex())).addMessage(chatMessage);
@@ -279,6 +279,9 @@ public class MainWindow extends javax.swing.JFrame {
                     mainWindowTabPane.setSelectedIndex(user.getTabIndex());
                 }
             }
+        } else if(message.getMessageCode().equals(PTPClientMessageCode.FILE_LIST_RECEIVE_SUCCESS)) {
+            message.getFrom().setTreeModel((FileTreeModel) message.getMessage());
+            ((UserPanel)mainWindowTabPane.getComponentAt(message.getFrom().getTabIndex())).updateTreeModel();
         }
     }
     
@@ -289,6 +292,12 @@ public class MainWindow extends javax.swing.JFrame {
                     pushMessage(message);
                     break;
                 case MESSAGE_RECEIVE_SUCCESS:
+                    pushMessage(message);
+                    break;
+                case FILE_LIST_REQUEST:
+                    PTPClient client = new PTPClient(message.getTo(), message.getFrom());
+                    client.sendFileListMessageClient(message.getTo().getTreeModel());
+                case FILE_LIST_RECEIVE_SUCCESS:
                     pushMessage(message);
                     break;
                 default:

@@ -39,6 +39,10 @@ public class UserPanel extends javax.swing.JPanel {
         ((FileTree) UserTreeView).initUser(from, to);
     }
     
+    public void updateTreeModel() {
+        ((FileTree) UserTreeView).setModel(from.getTreeModel());
+    }
+    
     public void setMessages(List<ChatMessage> messageList) {
         for(ChatMessage chatMessage : messageList) {
             this.addMessage(chatMessage);

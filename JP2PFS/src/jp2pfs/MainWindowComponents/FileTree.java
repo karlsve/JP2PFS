@@ -71,7 +71,7 @@ public class FileTree extends JTree {
     public void initUser(UserItem from, UserItem to) {
         this.from = from;
         this.to = to;
-        this.setModel(requestModel());
+        requestModel();
         this.addMouseListener(new MouseAdapter() {
             public void mouseClicked(final MouseEvent e) {
                 if(SwingUtilities.isRightMouseButton(e)) {
@@ -82,8 +82,9 @@ public class FileTree extends JTree {
         this.updateUI();
     }
     
-    private FileTreeModel requestModel() {
-        return null;
+    private void requestModel() {
+        PTPClient client = new PTPClient(from, to);
+        client.requestFileListClient();
     }
     
     private void callHomePopupMenu(int x, int y) {

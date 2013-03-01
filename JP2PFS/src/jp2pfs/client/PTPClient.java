@@ -24,7 +24,6 @@ public class PTPClient {
     private String downloadPath = "C:\\Documents and Settings\\All Users\\Downloads\\";
     List<PTPClientListener> clientListener = new ArrayList<PTPClientListener>();
     
-    
     public PTPClient(UserItem from, UserItem to)
     {
         this.from = from;
@@ -97,8 +96,6 @@ public class PTPClient {
     
     private void receiveFileListMessageClient(ObjectInputStream inputStream) throws Exception {
         File file = (File)inputStream.readObject();
-        PTPClient client = new PTPClient(to, from);
-        client.sendFileMessageClient(file);
     }
     
     private void receiveFileMessageRequestClient(ObjectInputStream inputStream) throws Exception {
@@ -140,6 +137,35 @@ public class PTPClient {
             ObjectOutputStream outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
             outputStream.writeByte(3);
             outputStream.writeObject(file);
+            outputStream.flush();
+            this.sendMessage(this, PTPClientMessageCode.FILE_SEND_SUCCESS, "File sent.");
+        } catch (Exception ex) {
+            this.sendDebugMessage(this, PTPClientMessageCode.FILE_SEND_ERROR, "Could not send the message.");
+        }
+    }
+    
+    public void requestFileListClient() {
+        if(clientSocket == null) {
+            this.connect();
+        }
+        try {
+            ObjectOutputStream outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
+            outputStream.writeByte(5);
+            outputStream.flush();
+        } catch(Exception e) {
+            System.out.println("Could not request fileList.");
+        }
+    }
+    
+    public void sendFileListMessageClient(Object list) {
+        
+        if(clientSocket == null) {
+            this.connect();
+        }
+        try {
+            ObjectOutputStream outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
+            outputStream.writeByte(4);
+            outputStream.writeObject(list);
             outputStream.flush();
             this.sendMessage(this, PTPClientMessageCode.FILE_SEND_SUCCESS, "File sent.");
         } catch (Exception ex) {
