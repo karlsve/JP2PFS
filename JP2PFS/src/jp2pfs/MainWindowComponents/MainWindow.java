@@ -193,7 +193,7 @@ public class MainWindow extends javax.swing.JFrame {
             list.addElement(user);
             user = new UserItem("Andreas Förtsch", InetAddress.getByName("172.30.64.150"), 2100, clientListener);
             list.addElement(user);
-            user = new UserItem("Sven Karliner", InetAddress.getByName("172.30.64.20"), 2100, clientListener);
+            user = new UserItem("Sven Karliner", InetAddress.getByName("172.30.64.100"), 2100, clientListener);
             list.addElement(user);
         } catch (UnknownHostException ex) {
             System.out.println(ex.getMessage());
