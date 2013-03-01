@@ -168,6 +168,7 @@ public class MainWindow extends javax.swing.JFrame {
             for(InetAddress ip : localip) {
                 if(current.getIp().equals(ip)) {
                     self = current;
+                    self.setTreeModel((FileTreeModel)fileTree.getModel());
                 }
             }
         }
