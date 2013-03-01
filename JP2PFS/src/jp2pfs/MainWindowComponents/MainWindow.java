@@ -280,8 +280,9 @@ public class MainWindow extends javax.swing.JFrame {
                 }
             }
         } else if(message.getMessageCode().equals(PTPClientMessageCode.FILE_LIST_RECEIVE_SUCCESS)) {
-            message.getFrom().setTreeModel((FileTreeModel) message.getMessage());
-            ((UserPanel)mainWindowTabPane.getComponentAt(message.getFrom().getTabIndex())).updateTreeModel();
+            FileTreeModel treeModel = (FileTreeModel) message.getMessage();
+            message.getFrom().setTreeModel(treeModel);
+            ((UserPanel)mainWindowTabPane.getComponentAt(message.getFrom().getTabIndex())).updateTreeModel(treeModel);
         }
     }
     

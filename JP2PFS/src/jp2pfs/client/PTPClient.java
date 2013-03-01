@@ -64,6 +64,8 @@ public class PTPClient {
                         receiveFileMessageRequestClient(inputStream);
                     case 4:
                         receiveFileListMessageClient(inputStream);
+                    case 5:
+                        this.sendMessage(this, PTPClientMessageCode.FILE_LIST_REQUEST, null);
                 }
             } catch (Exception ex) {
                 this.sendDebugMessage(this, PTPClientMessageCode.MESSAGE_RECEIVE_ERROR, "Could not receive the message.");
