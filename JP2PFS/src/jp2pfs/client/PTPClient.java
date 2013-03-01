@@ -8,6 +8,7 @@ import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import jp2pfs.MainWindowComponents.FileTreeModel;
 import jp2pfs.MainWindowComponents.UserItem;
 import jp2pfs.client.PTPClientMessage.PTPClientMessageCode;
 ;
@@ -65,10 +66,10 @@ public class PTPClient {
                     case 4:
                         receiveFileListMessageClient(inputStream);
                     case 5:
-                        this.sendMessage(this, PTPClientMessageCode.FILE_LIST_REQUEST, null);
+                        this.sendMessage(this, PTPClientMessageCode.FILE_LIST_REQUEST, "Test");
                 }
             } catch (Exception ex) {
-                this.sendDebugMessage(this, PTPClientMessageCode.MESSAGE_RECEIVE_ERROR, "Could not receive the message.");
+                this.sendDebugMessage(this, PTPClientMessageCode.MESSAGE_RECEIVE_ERROR, ex);
             }
         }
     }
@@ -97,7 +98,9 @@ public class PTPClient {
     }
     
     private void receiveFileListMessageClient(ObjectInputStream inputStream) throws Exception {
-        File file = (File)inputStream.readObject();
+        Object fileList = inputStream.readObject();
+        System.out.println(fileList.getClass());
+        this.sendMessage(this, PTPClientMessageCode.FILE_LIST_RECEIVE_SUCCESS, fileList);
     }
     
     private void receiveFileMessageRequestClient(ObjectInputStream inputStream) throws Exception {
@@ -169,9 +172,9 @@ public class PTPClient {
             outputStream.writeByte(4);
             outputStream.writeObject(list);
             outputStream.flush();
-            this.sendMessage(this, PTPClientMessageCode.FILE_SEND_SUCCESS, "File sent.");
+            this.sendMessage(this, PTPClientMessageCode.FILE_LIST_SEND_SUCCESS, "FileList sent.");
         } catch (Exception ex) {
-            this.sendDebugMessage(this, PTPClientMessageCode.FILE_SEND_ERROR, "Could not send the message.");
+            this.sendDebugMessage(this, PTPClientMessageCode.FILE_LIST_SEND_ERROR, "Could not send the message.");
         }
     }
     
@@ -216,7 +219,7 @@ public class PTPClient {
         }
     }
 
-    private void sendDebugMessage(Object sender, PTPClientMessageCode code, String content) {
+    private void sendDebugMessage(Object sender, PTPClientMessageCode code, Object content) {
         PTPClientMessage message = new PTPClientMessage(sender, code, content);
         for(PTPClientListener listener : clientListener) {
             if(listener != null)
@@ -224,7 +227,7 @@ public class PTPClient {
         }
     }
 
-    private void sendMessage(Object sender, PTPClientMessageCode code, String content) {
+    private void sendMessage(Object sender, PTPClientMessageCode code, Object content) {
         PTPClientMessage message = new PTPClientMessage(sender, code, content, from, to);
         for(PTPClientListener listener : clientListener) {
             if(listener != null)

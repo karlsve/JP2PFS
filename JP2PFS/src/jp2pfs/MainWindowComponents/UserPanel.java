@@ -41,6 +41,7 @@ public class UserPanel extends javax.swing.JPanel {
     
     public void updateTreeModel(FileTreeModel treeModel) {
         ((FileTree) UserTreeView).setModel(treeModel);
+        ((FileTree) UserTreeView).updateUI();
     }
     
     public void setMessages(List<ChatMessage> messageList) {

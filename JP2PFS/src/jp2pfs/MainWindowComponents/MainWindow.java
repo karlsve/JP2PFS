@@ -281,6 +281,7 @@ public class MainWindow extends javax.swing.JFrame {
             }
         } else if(message.getMessageCode().equals(PTPClientMessageCode.FILE_LIST_RECEIVE_SUCCESS)) {
             FileTreeModel treeModel = (FileTreeModel) message.getMessage();
+            System.out.println(treeModel);
             message.getFrom().setTreeModel(treeModel);
             ((UserPanel)mainWindowTabPane.getComponentAt(message.getFrom().getTabIndex())).updateTreeModel(treeModel);
         }
@@ -297,7 +298,7 @@ public class MainWindow extends javax.swing.JFrame {
                     break;
                 case FILE_LIST_REQUEST:
                     PTPClient client = new PTPClient(message.getTo(), message.getFrom());
-                    client.sendFileListMessageClient(message.getTo().getTreeModel());
+                    client.sendFileListMessageClient(self.getTreeModel());
                 case FILE_LIST_RECEIVE_SUCCESS:
                     pushMessage(message);
                     break;
