@@ -17,8 +17,6 @@ public class UserPanel extends javax.swing.JPanel {
     private UserItem to = null;
     private UserItem from = null;
     
-    private FileTreeModel treeModel = null;
-    
     
     public UserItem getTo() {
         return to;

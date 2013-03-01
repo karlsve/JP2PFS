@@ -79,7 +79,6 @@ public class FileTree extends JTree {
                 }
             }
         });
-        this.updateUI();
     }
     
     private void requestModel() {

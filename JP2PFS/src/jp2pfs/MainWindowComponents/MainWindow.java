@@ -299,6 +299,7 @@ public class MainWindow extends javax.swing.JFrame {
                 case FILE_LIST_REQUEST:
                     PTPClient client = new PTPClient(message.getTo(), message.getFrom());
                     client.sendFileListMessageClient(self.getTreeModel());
+                    break;
                 case FILE_LIST_RECEIVE_SUCCESS:
                     pushMessage(message);
                     break;

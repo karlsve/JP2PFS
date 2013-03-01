@@ -5,10 +5,11 @@
 package jp2pfs.client;
 
 import java.io.*;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.List;
-import jp2pfs.MainWindowComponents.FileTreeModel;
 import jp2pfs.MainWindowComponents.UserItem;
 import jp2pfs.client.PTPClientMessage.PTPClientMessageCode;
 ;
@@ -41,7 +42,10 @@ public class PTPClient {
     {
         if(clientSocket == null) {
             try {
-                clientSocket = new Socket(this.to.getIp().getHostAddress().toString(), this.to.getPort());
+                SocketAddress address = new InetSocketAddress(this.to.getIp().getHostAddress().toString(), this.to.getPort()); 
+                clientSocket = new Socket();
+                clientSocket.connect(address, 500);
+                clientSocket.setSoTimeout(3000);
                 this.sendDebugMessage(this, PTPClientMessageCode.CONNECTION_SUCCESS, "Connection to server established.");
             } catch(Exception e) {
                 this.sendDebugMessage(this, PTPClientMessageCode.CONNECTION_ERROR, "Connection to server could not be established.");
@@ -66,7 +70,7 @@ public class PTPClient {
                     case 4:
                         receiveFileListMessageClient(inputStream);
                     case 5:
-                        this.sendMessage(this, PTPClientMessageCode.FILE_LIST_REQUEST, "Test");
+                        this.sendMessage(this, PTPClientMessageCode.FILE_LIST_REQUEST, null);
                 }
             } catch (Exception ex) {
                 this.sendDebugMessage(this, PTPClientMessageCode.MESSAGE_RECEIVE_ERROR, ex);
@@ -99,7 +103,6 @@ public class PTPClient {
     
     private void receiveFileListMessageClient(ObjectInputStream inputStream) throws Exception {
         Object fileList = inputStream.readObject();
-        System.out.println(fileList.getClass());
         this.sendMessage(this, PTPClientMessageCode.FILE_LIST_RECEIVE_SUCCESS, fileList);
     }
     
@@ -158,7 +161,7 @@ public class PTPClient {
             outputStream.writeByte(5);
             outputStream.flush();
         } catch(Exception e) {
-            System.out.println("Could not request fileList.");
+            System.out.println("Could not request FileList.");
         }
     }
     
