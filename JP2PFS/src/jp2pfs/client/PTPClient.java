@@ -5,7 +5,6 @@
 package jp2pfs.client;
 
 import java.io.*;
-import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.ArrayList;
@@ -42,13 +41,23 @@ public class PTPClient {
     {
         if(clientSocket == null) {
             try {
-                SocketAddress address = new InetSocketAddress(this.to.getIp().getHostAddress().toString(), this.to.getPort()); 
+                SocketAddress address = this.to.getIp(); 
                 clientSocket = new Socket();
-                clientSocket.connect(address, 500);
-                clientSocket.setSoTimeout(3000);
+                clientSocket.connect(address);
                 this.sendDebugMessage(this, PTPClientMessageCode.CONNECTION_SUCCESS, "Connection to server established.");
             } catch(Exception e) {
                 this.sendDebugMessage(this, PTPClientMessageCode.CONNECTION_ERROR, "Connection to server could not be established.");
+            }
+        }
+    }
+    
+    private void disconnect() {
+        if(clientSocket != null) {
+            try {
+                clientSocket.close();
+                clientSocket = null;
+            } catch(Exception e) {
+                System.out.println(e.getMessage());
             }
         }
     }
@@ -67,24 +76,30 @@ public class PTPClient {
                         break;
                     case 3:
                         receiveFileMessageRequestClient(inputStream);
+                        break;
                     case 4:
                         receiveFileListMessageClient(inputStream);
+                        break;
                     case 5:
                         this.sendMessage(this, PTPClientMessageCode.FILE_LIST_REQUEST, null);
+                        break;
+                    case 0:
+                        receiveUserListUpdate(inputStream);
+                        break;
                 }
             } catch (Exception ex) {
                 this.sendDebugMessage(this, PTPClientMessageCode.MESSAGE_RECEIVE_ERROR, ex);
+                ex.printStackTrace();
             }
         }
     }
 
     private void receiveTextMessageClient(ObjectInputStream inputStream) throws IOException {
-        String message = "";
-        message = inputStream.readUTF();
+        String message = inputStream.readUTF();
         this.sendMessage(this, PTPClientMessageCode.MESSAGE_RECEIVE_SUCCESS, message);
     }
 
-    private void receiveFileMessageClient(ObjectInputStream inputStream) throws IOException {
+    private void receiveFileMessageClient(ObjectInputStream inputStream) throws Exception {
         int bufferSize = 150000;
         int bytesRead = 0;
         
@@ -113,9 +128,7 @@ public class PTPClient {
     }
     
     public void sendFileMessageClient(File file) {
-        if(clientSocket == null) {
-            this.connect();
-        }
+        this.connect();
         try {
             ObjectOutputStream outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
             outputStream.writeByte(2);
@@ -137,10 +150,30 @@ public class PTPClient {
         }
     }
     
-    public void requestFileMessageClient(File file) {
-        if(clientSocket == null) {
-            this.connect();
+    public void register() {
+        this.connect();
+        try {
+            ObjectOutputStream outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
+            outputStream.writeByte(0);
+            outputStream.writeUTF(from.getUsername());
+            outputStream.flush();
+        } catch(Exception e) {
         }
+    }
+    
+    public void requestUserList() {
+        this.connect();
+        try {
+            ObjectOutputStream outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
+            outputStream.writeByte(2);
+            outputStream.writeObject(from.getIp());
+            outputStream.flush();
+        } catch(Exception e) {
+        }
+    }
+    
+    public void requestFileMessageClient(File file) {
+        this.connect();
         try {
             ObjectOutputStream outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
             outputStream.writeByte(3);
@@ -153,9 +186,7 @@ public class PTPClient {
     }
     
     public void requestFileListClient() {
-        if(clientSocket == null) {
-            this.connect();
-        }
+        this.connect();
         try {
             ObjectOutputStream outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
             outputStream.writeByte(5);
@@ -166,10 +197,7 @@ public class PTPClient {
     }
     
     public void sendFileListMessageClient(Object list) {
-        
-        if(clientSocket == null) {
-            this.connect();
-        }
+        this.connect();
         try {
             ObjectOutputStream outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
             outputStream.writeByte(4);
@@ -182,9 +210,7 @@ public class PTPClient {
     }
     
     public void sendTextMessageClient(String message) {
-        if(clientSocket == null) {
-            this.connect();
-        }
+        this.connect();
         try {
             ObjectOutputStream outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
             outputStream.writeByte(1);
@@ -225,17 +251,24 @@ public class PTPClient {
     private void sendDebugMessage(Object sender, PTPClientMessageCode code, Object content) {
         PTPClientMessage message = new PTPClientMessage(sender, code, content);
         for(PTPClientListener listener : clientListener) {
-            if(listener != null)
+            if(listener != null) {
                 listener.onMessage(message);
+            }
         }
     }
 
     private void sendMessage(Object sender, PTPClientMessageCode code, Object content) {
         PTPClientMessage message = new PTPClientMessage(sender, code, content, from, to);
         for(PTPClientListener listener : clientListener) {
-            if(listener != null)
+            if(listener != null) {
                 listener.onMessage(message);
+            }
         }
+    }
+
+    private void receiveUserListUpdate(ObjectInputStream inputStream) throws Exception {
+        Object object = (Object)inputStream.readObject();
+        sendMessage(this, PTPClientMessageCode.USER_LIST_RECEIVE_SUCCESS, object);
     }
     
 }

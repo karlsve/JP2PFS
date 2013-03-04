@@ -7,9 +7,13 @@ package jp2pfs.MainWindowComponents;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.*;
 import jp2pfs.Chat.ChatMessage;
 import jp2pfs.client.PTPClient;
@@ -28,7 +32,7 @@ import jp2pfs.server.PTPServerMessage;
 public class MainWindow extends javax.swing.JFrame {
     
     private PTPServer server = null;
-    int serverport = 2100;
+    int serverport = 0;
     
     UserItem self = null;
     
@@ -134,15 +138,26 @@ public class MainWindow extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
     private void init() {
-        initTabPane();
+        initServerConnection();
         initUserList();
+        initTabPane();
         startServer();
-        initUser();
         ((FileTree)fileTree).initHome();
+    }
+
+    private void initServerConnection() {
+        try {
+            UserItem from = new UserItem(InetAddress.getLocalHost().toString(), new InetSocketAddress(InetAddress.getLocalHost(), 2100));
+            UserItem to = new UserItem(InetAddress.getLocalHost().toString(), new InetSocketAddress(InetAddress.getLocalHost() /*InetAddress.getByName("dauerstoned-clan.de")*/, 1234));
+            new PTPClient(from, to).register();
+        } catch (UnknownHostException ex) {
+            System.out.println(ex.getMessage());
+        }
     }
     
     private void initTabPane() {
         mainWindowTabPane.addMouseListener(new MouseAdapter() {
+            @Override
             public void mouseClicked(final MouseEvent e) {
                 if(SwingUtilities.isRightMouseButton(e)) {
                     int index = mainWindowTabPane.getSelectedIndex();
@@ -166,7 +181,7 @@ public class MainWindow extends javax.swing.JFrame {
         for(int i = 0; i<userList.getModel().getSize(); i++) {
             UserItem current = (UserItem)userList.getModel().getElementAt(i);
             for(InetAddress ip : localip) {
-                if(current.getIp().equals(ip)) {
+                if(current.getIp().getAddress().equals(ip)) {
                     self = current;
                     self.setTreeModel((FileTreeModel)fileTree.getModel());
                 }
@@ -180,24 +195,15 @@ public class MainWindow extends javax.swing.JFrame {
                 JList list = (JList)evt.getSource();
                 if (evt.getClickCount() == 2) {
                     int index = list.locationToIndex(evt.getPoint());
-                    createTabUser(index);
+                    if(index >= 0) {
+                        createTabUser(index);
+                    }
                 } else if (evt.getClickCount() == 3) {   // Triple-click
                     int index = list.locationToIndex(evt.getPoint());
 
                 }
             }
         });
-        DefaultListModel<UserItem> list = (DefaultListModel<UserItem>)userList.getModel();
-        try {
-            UserItem user = new UserItem("Marvin Middel", InetAddress.getByName("172.30.64.19"), 2100, clientListener);
-            list.addElement(user);
-            user = new UserItem("Andreas Förtsch", InetAddress.getByName("172.30.64.150"), 2100, clientListener);
-            list.addElement(user);
-            user = new UserItem("Sven Karliner", InetAddress.getByName("172.30.64.100"), 2100, clientListener);
-            list.addElement(user);
-        } catch (UnknownHostException ex) {
-            System.out.println(ex.getMessage());
-        }
     }
     
     private void createTabUser(int userindex) {
@@ -281,10 +287,10 @@ public class MainWindow extends javax.swing.JFrame {
                 }
             }
         } else if(message.getMessageCode().equals(PTPClientMessageCode.FILE_LIST_RECEIVE_SUCCESS)) {
-            FileTreeModel treeModel = (FileTreeModel) message.getMessage();
-            System.out.println(treeModel);
-            message.getFrom().setTreeModel(treeModel);
-            ((UserPanel)mainWindowTabPane.getComponentAt(message.getFrom().getTabIndex())).updateTreeModel(treeModel);
+            FileTreeModel currentTreeModel = (FileTreeModel) message.getMessage();
+            System.out.println(currentTreeModel);
+            message.getFrom().setTreeModel(currentTreeModel);
+            ((UserPanel)mainWindowTabPane.getComponentAt(message.getFrom().getTabIndex())).updateTreeModel(currentTreeModel);
         }
     }
     
@@ -304,11 +310,26 @@ public class MainWindow extends javax.swing.JFrame {
                 case FILE_LIST_RECEIVE_SUCCESS:
                     pushMessage(message);
                     break;
+                case USER_LIST_RECEIVE_SUCCESS:
+                    updateUserList(message);
+                    break;
                 default:
                     System.out.println(message.getMessage());
                     break;
                     
             }
         }
+    }
+
+    private void updateUserList(PTPClientMessage message) {
+        DefaultListModel<UserItem> list = (DefaultListModel<UserItem>)userList.getModel();
+        list.clear();
+        LinkedHashMap map = (LinkedHashMap)message.getMessage();
+        Iterator it = map.entrySet().iterator();
+        while(it.hasNext()) {
+            Map.Entry entry = (Map.Entry)it.next();
+            list.addElement(new UserItem((String)entry.getValue(), (InetSocketAddress)entry.getKey()));
+        }
+        initUser();
     }
 }

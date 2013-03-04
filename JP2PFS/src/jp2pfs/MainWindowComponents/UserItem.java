@@ -5,10 +5,10 @@
 package jp2pfs.MainWindowComponents;
 
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import jp2pfs.Chat.ChatMessage;
-import jp2pfs.client.PTPClient;
 import jp2pfs.client.PTPClientListener;
 
 /**
@@ -19,8 +19,7 @@ public class UserItem {
     
     private String username = "";
     private String password = "";
-    private InetAddress ip = null;
-    private int port = 0;
+    private InetSocketAddress ip = null;
     private int tabIndex = 0;
     
     FileTreeModel treeModel = null;
@@ -45,7 +44,7 @@ public class UserItem {
         return clientListener;
     }
 
-    public InetAddress getIp() {
+    public InetSocketAddress getIp() {
         return ip;
     }
 
@@ -55,10 +54,6 @@ public class UserItem {
     
     public void addMessage(ChatMessage message) {
         messages.add(message);
-    }
-
-    public int getPort() {
-        return port;
     }
 
     public String getUsername() {
@@ -73,26 +68,24 @@ public class UserItem {
         this.treeModel = treeModel;
     }
     
-    public UserItem(String username, String password, InetAddress ip, int port) {
+    public UserItem(String username, String password, InetSocketAddress ip) {
         this.username = username;
         this.password = password;
         this.ip = ip;
-        this.port = port;
     }
     
-    public UserItem(String username, InetAddress ip, int port, PTPClientListener listener) {
+    public UserItem(String username, InetSocketAddress ip, PTPClientListener listener) {
         this.username = username;
         this.ip = ip;
-        this.port = port;
         this.clientListener = listener;
     }
     
-    public UserItem(String username, InetAddress ip, int port) {
+    public UserItem(String username, InetSocketAddress ip) {
         this.username = username;
         this.ip = ip;
-        this.port = port;
     }
     
+    @Override
     public String toString() {
         return username;
     }
