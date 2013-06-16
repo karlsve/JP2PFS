@@ -4,6 +4,7 @@
  */
 package jp2pfs;
 
+import jp2pfs.MainWindowComponents.LoginWindow;
 import jp2pfs.MainWindowComponents.MainWindow;
 
 /**
@@ -20,16 +21,28 @@ public class JavaPeerToPeerFileSharing {
     }
     
     public JavaPeerToPeerFileSharing() {
-        initMainWindow();
+        initLoginWindow();
+        //initMainWindow();
     }
 
     private void initMainWindow() {
         java.awt.EventQueue.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 mainWindow = new MainWindow();
                 mainWindow.setTitle(title);
                 mainWindow.setVisible(true);
+            }
+        });
+    }
+
+    private void initLoginWindow() {
+        java.awt.EventQueue.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                new LoginWindow();
             }
         });
     }
