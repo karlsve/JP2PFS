@@ -15,9 +15,5 @@ public class ConfigurationTest {
     
     @Test
     public void Test1() {
-        String sep = File.separator;
-        Configuration config = new Configuration("D:"+sep+"jp2pfs"+sep+"test.conf");
-        config.put("eins", "Test1");
-        config.saveConfiguration();
     }
 }
