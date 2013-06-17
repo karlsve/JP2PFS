@@ -2,9 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package jp2pfs.Chat;
+package jp2pfs.peering.chat;
 
-import jp2pfs.MainWindowComponents.UserItem;
+import jp2pfs.ui.main.UserItem;
 
 /**
  *

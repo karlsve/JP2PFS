@@ -2,14 +2,14 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package jp2pfs.MainWindowComponents;
+package jp2pfs.ui.main;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
-import jp2pfs.Chat.ChatMessage;
-import jp2pfs.client.PTPClientListener;
+import jp2pfs.peering.chat.ChatMessage;
+import jp2pfs.peering.client.ClientListener;
 
 /**
  *
@@ -26,7 +26,7 @@ public class UserItem {
     
     private List<ChatMessage> messages = new ArrayList<ChatMessage>();
     
-    private PTPClientListener clientListener = null;
+    private ClientListener clientListener = null;
 
     public int getTabIndex() {
         return tabIndex;
@@ -40,7 +40,7 @@ public class UserItem {
         return password;
     }
 
-    public PTPClientListener getClientListener() {
+    public ClientListener getClientListener() {
         return clientListener;
     }
 
@@ -74,7 +74,7 @@ public class UserItem {
         this.ip = ip;
     }
     
-    public UserItem(String username, InetSocketAddress ip, PTPClientListener listener) {
+    public UserItem(String username, InetSocketAddress ip, ClientListener listener) {
         this.username = username;
         this.ip = ip;
         this.clientListener = listener;

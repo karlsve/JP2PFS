@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package jp2pfs.MainWindowComponents;
+package jp2pfs.ui.main;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,16 +10,13 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import javax.swing.*;
-import jp2pfs.client.PTPClient;
+import jp2pfs.peering.client.Client;
 
 /**
  *
  * @author karlinsv
  */
 public class FileTree extends JTree {
-    
-    UserItem to = null;
-    UserItem from = null;
     
     private ActionListener treeUserActionListener = new ActionListener() {
 
@@ -68,9 +65,7 @@ public class FileTree extends JTree {
         this.updateUI();
     }
     
-    public void initUser(UserItem from, UserItem to) {
-        this.from = from;
-        this.to = to;
+    public void initUser() {
         requestModel();
         this.addMouseListener(new MouseAdapter() {
             public void mouseClicked(final MouseEvent e) {
@@ -82,8 +77,6 @@ public class FileTree extends JTree {
     }
     
     private void requestModel() {
-        PTPClient client = new PTPClient(from, to);
-        client.requestFileListClient();
     }
     
     private void callHomePopupMenu(int x, int y) {
@@ -150,9 +143,6 @@ public class FileTree extends JTree {
     private void getFile() {
         if(this.getSelectionPath() != null) {
             FileBranch element = (FileBranch)this.getSelectionPath().getLastPathComponent();
-            
-            PTPClient client = new PTPClient(from, to);
-            client.requestFileMessageClient(element.getFile());
         }
     }
     

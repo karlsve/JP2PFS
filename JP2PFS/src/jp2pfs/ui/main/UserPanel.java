@@ -2,39 +2,24 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package jp2pfs.MainWindowComponents;
+package jp2pfs.ui.main;
 
 import java.util.List;
-import jp2pfs.Chat.ChatMessage;
-import jp2pfs.client.PTPClient;
+import jp2pfs.peering.chat.ChatMessage;
+import jp2pfs.peering.client.Client;
 
 /**
  *
  * @author karlinsv
  */
 public class UserPanel extends javax.swing.JPanel {
-
-    private UserItem to = null;
-    private UserItem from = null;
-    
-    
-    public UserItem getTo() {
-        return to;
-    }
-    
-    public UserItem getFrom() {
-        return from;
-    }
-    
     /**
      * Creates new form UserPanel
      */
-    public UserPanel(UserItem from, UserItem to) {
-        this.to = to;
-        this.from = from;
+    public UserPanel() {
         
         initComponents();
-        ((FileTree) UserTreeView).initUser(from, to);
+        
     }
     
     public void updateTreeModel(FileTreeModel treeModel) {
@@ -97,7 +82,7 @@ public class UserPanel extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jProgressBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jScrollPane1)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 507, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 503, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(UserChatInput)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -122,9 +107,6 @@ public class UserPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void UserChatSendMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_UserChatSendMouseClicked
-        PTPClient client = new PTPClient(from, to);
-        client.addListener(from.getClientListener());
-        client.sendTextMessageClient(UserChatInput.getText());
         UserChatInput.setText("");
     }//GEN-LAST:event_UserChatSendMouseClicked
 

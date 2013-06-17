@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package jp2pfs.MainWindowComponents;
+package jp2pfs.ui.main;
 
 import java.io.File;
 

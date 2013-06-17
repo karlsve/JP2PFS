@@ -2,12 +2,12 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package jp2pfs.server;
+package jp2pfs.peering.server;
 
 /**
  *
  * @author karlinsv
  */
-public interface PTPServerListener {
-    public void onMessage(PTPServerMessage message);
+public interface ServerListener {
+    public void onMessage(ServerMessage message);
 }
