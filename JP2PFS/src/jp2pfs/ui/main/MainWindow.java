@@ -6,25 +6,18 @@ package jp2pfs.ui.main;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import javax.swing.*;
+import javax.swing.DefaultListModel;
+import javax.swing.SwingUtilities;
 import jp2pfs.peering.Manager;
-import jp2pfs.peering.client.Client;
-import jp2pfs.peering.client.ClientListener;
-import jp2pfs.peering.client.ClientMessage;
-import jp2pfs.peering.server.Server;
-import jp2pfs.peering.server.ServerListener;
-import jp2pfs.peering.server.ServerMessage;
 
 /**
  *
- * @author karlinsv
+ * @author karlsve
  */
 public class MainWindow extends javax.swing.JFrame {
 
     private Manager manager = null;
     
-    private FileTreeModel treeModel = null;
-
     /**
      * Creates new form MainWindow
      */
@@ -43,41 +36,23 @@ public class MainWindow extends javax.swing.JFrame {
     private void initComponents() {
 
         jSplitPane1 = new javax.swing.JSplitPane();
-        userListScrollPane = new javax.swing.JScrollPane();
-        userList = new javax.swing.JList();
-        mainWindowTabPane = new javax.swing.JTabbedPane();
-        mainWindowHomePanel = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        fileTree = new FileTree();
+        jList1 = new javax.swing.JList();
+        mainWindowTabPane = new javax.swing.JTabbedPane();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        fileTree = new jp2pfs.ui.main.FileTree();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setName("MainWindow"); // NOI18N
-        setResizable(false);
 
-        jSplitPane1.setDividerLocation(110);
+        jList1.setModel(new DefaultListModel<UserItem>());
+        jScrollPane1.setViewportView(jList1);
 
-        userListScrollPane.setName("Userlist"); // NOI18N
-
-        userList.setModel(new DefaultListModel<UserItem>());
-        userListScrollPane.setViewportView(userList);
-
-        jSplitPane1.setLeftComponent(userListScrollPane);
+        jSplitPane1.setLeftComponent(jScrollPane1);
 
         fileTree.setModel(new FileTreeModel());
-        jScrollPane1.setViewportView(fileTree);
+        jScrollPane2.setViewportView(fileTree);
 
-        javax.swing.GroupLayout mainWindowHomePanelLayout = new javax.swing.GroupLayout(mainWindowHomePanel);
-        mainWindowHomePanel.setLayout(mainWindowHomePanelLayout);
-        mainWindowHomePanelLayout.setHorizontalGroup(
-            mainWindowHomePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 483, Short.MAX_VALUE)
-        );
-        mainWindowHomePanelLayout.setVerticalGroup(
-            mainWindowHomePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 425, Short.MAX_VALUE)
-        );
-
-        mainWindowTabPane.addTab("Home", mainWindowHomePanel);
+        mainWindowTabPane.addTab("tab1", jScrollPane2);
 
         jSplitPane1.setRightComponent(mainWindowTabPane);
 
@@ -85,27 +60,32 @@ public class MainWindow extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 604, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane1)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 274, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTree fileTree;
+    private jp2pfs.ui.main.FileTree fileTree;
+    private javax.swing.JList jList1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSplitPane jSplitPane1;
-    private javax.swing.JPanel mainWindowHomePanel;
     private javax.swing.JTabbedPane mainWindowTabPane;
-    private javax.swing.JList userList;
-    private javax.swing.JScrollPane userListScrollPane;
     // End of variables declaration//GEN-END:variables
 
     private void init(Manager manager) {
-        initTabPane();
+        this.initTabPane();
         ((FileTree) fileTree).initHome();
         this.setVisible(true);
         this.manager = manager;
